@@ -1,0 +1,51 @@
+{
+	"name": "cxs-cloner",
+	"version": "0.1.0",
+	"description": "CLI tool to clone and modify Codex sessions",
+	"type": "module",
+	"main": "dist/cli.js",
+	"bin": {
+		"cxs-cloner": "./dist/cli.js"
+	},
+	"files": ["dist", "README.md"],
+	"scripts": {
+		"format": "biome format --write src test",
+		"format:check": "biome format src test",
+		"lint": "biome lint src test",
+		"check": "biome check src test",
+		"typecheck": "tsc --noEmit",
+		"test": "bun test",
+		"red-verify": "bun run format:check && bun run lint && bun run typecheck",
+		"verify": "bun run format:check && bun run lint && bun run typecheck && bun test",
+		"guard:no-test-changes": "git diff --name-only test/ | grep . && echo 'ERROR: Test files were modified during Green phase' && exit 1 || true",
+		"green-verify": "bun run verify && bun run guard:no-test-changes",
+		"verify-all": "bun run verify",
+		"build": "bun build ./src/cli.ts --outdir ./dist --target node --external c12 --external node-fetch-native"
+	},
+	"dependencies": {
+		"c12": "^3.3.3",
+		"citty": "^0.2.0",
+		"consola": "^3.4.0",
+		"pathe": "^2.0.0",
+		"zod": "^3.24.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.12",
+		"@types/bun": "^1.2.0",
+		"typescript": "^5.7.2"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"author": "Lee Moore <lee@liminal.ai>",
+	"keywords": [
+		"codex",
+		"session",
+		"clone",
+		"cli",
+		"context",
+		"token",
+		"compression"
+	],
+	"license": "MIT"
+}

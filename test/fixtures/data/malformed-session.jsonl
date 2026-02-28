@@ -1,0 +1,5 @@
+{"timestamp":"2025-01-15T10:00:00.000Z","type":"session_meta","payload":{"id":"sess_bad_0001","timestamp":"2025-01-15T10:00:00.000Z","cwd":"/tmp/test-project","originator":"test","cli_version":"1.0.0","source":"fixture"}}
+{this is not valid json at all
+{"timestamp":"2025-01-15T10:00:02.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Valid line after bad line"}]}}
+{"truncated": true, "missing_fields
+{"timestamp":"2025-01-15T10:00:04.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Another valid line"}],"end_turn":true}}

@@ -1,0 +1,10 @@
+{"timestamp":"2025-01-15T10:00:00.000Z","type":"session_meta","payload":{"id":"sess_compacted_0001","timestamp":"2025-01-15T10:00:00.000Z","cwd":"/tmp/test-project","originator":"test","cli_version":"1.0.0","source":"fixture"}}
+{"timestamp":"2025-01-15T10:00:01.000Z","type":"turn_context","payload":{"turn_id":"turn_0","cwd":"/tmp/test-project","model":"o4-mini","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"off"},"summary":null}}
+{"timestamp":"2025-01-15T10:00:02.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"First message"}]}}
+{"timestamp":"2025-01-15T10:00:03.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"First response"}],"end_turn":true}}
+{"timestamp":"2025-01-15T10:00:04.000Z","type":"compacted","payload":{"message":"Context compacted to save tokens"}}
+{"timestamp":"2025-01-15T10:00:05.000Z","type":"turn_context","payload":{"turn_id":"turn_1","cwd":"/tmp/test-project","model":"o4-mini","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"off"},"summary":null}}
+{"timestamp":"2025-01-15T10:00:06.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Message after compaction"}]}}
+{"timestamp":"2025-01-15T10:00:07.000Z","type":"response_item","payload":{"type":"function_call","name":"write_file","arguments":"{\"path\":\"/tmp/out.ts\",\"content\":\"export {}\"}","call_id":"call_0001"}}
+{"timestamp":"2025-01-15T10:00:08.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_0001","output":"File written"}}
+{"timestamp":"2025-01-15T10:00:09.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Done after compaction"}],"end_turn":true}}
