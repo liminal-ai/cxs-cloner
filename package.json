@@ -35,7 +35,7 @@
 		"typescript": "^5.7.2"
 	},
 	"engines": {
-		"node": ">=18.0.0"
+		"node": ">=20.12.0"
 	},
 	"author": "Lee Moore <lee@liminal.ai>",
 	"keywords": [

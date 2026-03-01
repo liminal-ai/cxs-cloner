@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
-import { NotImplementedError } from "./errors/clone-operation-errors.js";
+import { runMain } from "citty";
+import { normalizeArgs } from "./cli/normalize-args.js";
+import { mainCommand } from "./commands/main-command.js";
 
-function main(): void {
-	throw new NotImplementedError("cli main");
-}
-
-main();
+const argv = normalizeArgs(process.argv.slice(2));
+runMain(mainCommand, { rawArgs: argv });

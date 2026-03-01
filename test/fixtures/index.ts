@@ -17,5 +17,13 @@ export async function readFixtureSession(
 	return content
 		.split("\n")
 		.filter((line) => line.trim() !== "")
-		.map((line) => JSON.parse(line) as RolloutLine);
+		.map((line, index) => {
+			try {
+				return JSON.parse(line) as RolloutLine;
+			} catch (error) {
+				throw new Error(
+					`Malformed JSON in fixture "${filename}" at line ${index + 1}: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
+		});
 }

@@ -1,6 +1,5 @@
 import type {
 	GitInfo,
-	ResponseItemPayload,
 	RolloutLine,
 	SessionMetaPayload,
 } from "./codex-session-types.js";
@@ -44,6 +43,7 @@ export interface CloneResult {
 export interface CloneStatistics {
 	turnCountOriginal: number;
 	turnCountOutput: number;
+	/** Counts tool call initiation records removed, not paired output records. */
 	functionCallsRemoved: number;
 	functionCallsTruncated: number;
 	reasoningBlocksRemoved: number;
@@ -107,4 +107,22 @@ export interface ScanOptions {
 
 export interface ParseOptions {
 	strict: boolean;
+}
+
+/** Statistics computed from a parsed session. */
+export interface SessionStatistics {
+	functionCalls: number;
+	reasoningBlocks: number;
+	messages: number;
+	localShellCalls: number;
+	customToolCalls: number;
+	webSearchCalls: number;
+	ghostSnapshots: number;
+	compactionItems: number;
+	eventMessages: number;
+	turns: number;
+	compactedRecords: number;
+	compactedPositions: number[];
+	fileSizeBytes: number;
+	estimatedTokens: number;
 }

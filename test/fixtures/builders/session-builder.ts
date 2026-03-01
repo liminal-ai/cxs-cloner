@@ -1,11 +1,11 @@
 import type {
 	CompactedPayload,
+	CustomToolCallOutputPayload,
+	CustomToolCallPayload,
 	EventMsgPayload,
 	FunctionCallOutputPayload,
 	FunctionCallPayload,
 	LocalShellCallPayload,
-	CustomToolCallPayload,
-	CustomToolCallOutputPayload,
 	MessagePayload,
 	ReasoningPayload,
 	RolloutLine,
@@ -23,25 +23,17 @@ interface TurnOptions {
 	events?: string[];
 }
 
-let callIdCounter = 0;
-
-function nextCallId(): string {
-	callIdCounter++;
-	return `call_${callIdCounter.toString().padStart(4, "0")}`;
-}
-
 function isoTimestamp(offset: number): string {
-	return new Date(Date.UTC(2025, 0, 15, 10, 0, 0) + offset * 1000).toISOString();
+	return new Date(
+		Date.UTC(2025, 0, 15, 10, 0, 0) + offset * 1000,
+	).toISOString();
 }
 
 export class SessionBuilder {
 	private records: RolloutLine[] = [];
 	private timestampOffset = 0;
 	private turnCount = 0;
-
-	constructor() {
-		callIdCounter = 0;
-	}
+	private callIdCounter = 0;
 
 	addSessionMeta(overrides?: Partial<SessionMetaPayload>): this {
 		const payload: SessionMetaPayload = {
@@ -133,7 +125,7 @@ export class SessionBuilder {
 
 		// Function calls (paired: function_call + function_call_output)
 		for (let i = 0; i < opts.functionCalls; i++) {
-			const callId = nextCallId();
+			const callId = this.nextCallId();
 			const fnCall: FunctionCallPayload = {
 				type: "function_call",
 				name: `tool_${i}`,
@@ -164,6 +156,7 @@ export class SessionBuilder {
 		for (let i = 0; i < opts.localShellCalls; i++) {
 			const shellCall: LocalShellCallPayload = {
 				type: "local_shell_call",
+				call_id: this.nextCallId(),
 				action: { command: ["ls", "-la"] },
 				status: "completed",
 			};
@@ -177,7 +170,7 @@ export class SessionBuilder {
 
 		// Custom tool calls (paired: custom_tool_call + custom_tool_call_output)
 		for (let i = 0; i < opts.customToolCalls; i++) {
-			const callId = nextCallId();
+			const callId = this.nextCallId();
 			const customCall: CustomToolCallPayload = {
 				type: "custom_tool_call",
 				call_id: callId,
@@ -257,5 +250,10 @@ export class SessionBuilder {
 
 	build(): RolloutLine[] {
 		return [...this.records];
+	}
+
+	private nextCallId(): string {
+		this.callIdCounter++;
+		return `call_${this.callIdCounter.toString().padStart(4, "0")}`;
 	}
 }

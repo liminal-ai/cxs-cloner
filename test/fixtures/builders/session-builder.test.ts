@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { SessionBuilder } from "./session-builder.js";
 import type { RolloutLine } from "../../../src/types/codex-session-types.js";
+import { SessionBuilder } from "./session-builder.js";
 
 describe("SessionBuilder", () => {
 	it("produces a valid RolloutLine array with session_meta", () => {
@@ -150,9 +150,9 @@ describe("SessionBuilder", () => {
 			.build();
 
 		for (let i = 1; i < lines.length; i++) {
-			expect(
-				new Date(lines[i].timestamp).getTime(),
-			).toBeGreaterThanOrEqual(new Date(lines[i - 1].timestamp).getTime());
+			expect(new Date(lines[i].timestamp).getTime()).toBeGreaterThanOrEqual(
+				new Date(lines[i - 1].timestamp).getTime(),
+			);
 		}
 	});
 });

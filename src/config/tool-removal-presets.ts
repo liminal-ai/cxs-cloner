@@ -1,4 +1,4 @@
-import { NotImplementedError } from "../errors/clone-operation-errors.js";
+import { ConfigurationError } from "../errors/clone-operation-errors.js";
 import type { ToolRemovalPreset } from "../types/tool-removal-types.js";
 
 export const DEFAULT_TRUNCATE_LENGTH = 120;
@@ -10,25 +10,41 @@ export const BUILT_IN_PRESETS: Record<string, ToolRemovalPreset> = {
 	extreme: { keepTurnsWithTools: 0, truncatePercent: 0 },
 };
 
-/** Resolve a preset name to a ToolRemovalPreset, checking built-in and custom presets. */
+/** Resolve a preset name to a ToolRemovalPreset, checking custom presets first, then built-in. */
 export function resolvePreset(
-	_name: string,
-	_customPresets?: Record<string, ToolRemovalPreset>,
+	name: string,
+	customPresets?: Record<string, ToolRemovalPreset>,
 ): ToolRemovalPreset {
-	throw new NotImplementedError("resolvePreset");
+	if (customPresets?.[name]) {
+		return customPresets[name];
+	}
+	if (BUILT_IN_PRESETS[name]) {
+		return BUILT_IN_PRESETS[name];
+	}
+	const available = listAvailablePresets(customPresets);
+	throw new ConfigurationError(
+		"preset",
+		`Unknown preset "${name}". Available presets: ${available.join(", ")}`,
+	);
 }
 
 /** Check whether a preset name is valid (built-in or custom). */
 export function isValidPresetName(
-	_name: string,
-	_customPresets?: Record<string, ToolRemovalPreset>,
+	name: string,
+	customPresets?: Record<string, ToolRemovalPreset>,
 ): boolean {
-	throw new NotImplementedError("isValidPresetName");
+	return !!(customPresets?.[name] || BUILT_IN_PRESETS[name]);
 }
 
 /** List all available preset names (built-in + custom). */
 export function listAvailablePresets(
-	_customPresets?: Record<string, ToolRemovalPreset>,
+	customPresets?: Record<string, ToolRemovalPreset>,
 ): string[] {
-	throw new NotImplementedError("listAvailablePresets");
+	const names = new Set(Object.keys(BUILT_IN_PRESETS));
+	if (customPresets) {
+		for (const key of Object.keys(customPresets)) {
+			names.add(key);
+		}
+	}
+	return [...names];
 }

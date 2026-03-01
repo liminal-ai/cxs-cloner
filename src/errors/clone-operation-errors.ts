@@ -1,7 +1,7 @@
 /** Thrown by stubs during development. */
 export class NotImplementedError extends Error {
-	constructor(method: string) {
-		super(`Not implemented: ${method}`);
+	constructor(functionName: string) {
+		super(`${functionName} is not yet implemented`);
 		this.name = "NotImplementedError";
 	}
 }
@@ -17,9 +17,12 @@ export class CxsError extends Error {
 export class SessionNotFoundError extends CxsError {
 	constructor(
 		public readonly sessionId: string,
-		public readonly candidates: string[] = [],
+		public readonly candidates?: string[],
 	) {
-		super(`Session not found: ${sessionId}`);
+		const msg = candidates?.length
+			? `Session "${sessionId}" not found. Did you mean: ${candidates.join(", ")}?`
+			: `Session "${sessionId}" not found.`;
+		super(msg);
 		this.name = "SessionNotFoundError";
 	}
 }
@@ -30,7 +33,7 @@ export class AmbiguousMatchError extends CxsError {
 		public readonly matches: string[],
 	) {
 		super(
-			`Ambiguous session ID "${partialId}" matches ${matches.length} sessions`,
+			`Partial ID "${partialId}" matches multiple sessions: ${matches.join(", ")}`,
 		);
 		this.name = "AmbiguousMatchError";
 	}
@@ -41,7 +44,7 @@ export class InvalidSessionError extends CxsError {
 		public readonly filePath: string,
 		public readonly reason: string,
 	) {
-		super(`Invalid session at ${filePath}: ${reason}`);
+		super(`Invalid session file "${filePath}": ${reason}`);
 		this.name = "InvalidSessionError";
 	}
 }
@@ -51,7 +54,7 @@ export class MalformedJsonError extends CxsError {
 		public readonly filePath: string,
 		public readonly lineNumber: number,
 	) {
-		super(`Malformed JSON at ${filePath}:${lineNumber}`);
+		super(`Malformed JSON at line ${lineNumber} in "${filePath}"`);
 		this.name = "MalformedJsonError";
 	}
 }
@@ -61,7 +64,7 @@ export class ConfigurationError extends CxsError {
 		public readonly field: string,
 		message: string,
 	) {
-		super(message);
+		super(`Configuration error (${field}): ${message}`);
 		this.name = "ConfigurationError";
 	}
 }
@@ -71,7 +74,7 @@ export class ArgumentValidationError extends CxsError {
 		public readonly argument: string,
 		message: string,
 	) {
-		super(message);
+		super(`Invalid argument "${argument}": ${message}`);
 		this.name = "ArgumentValidationError";
 	}
 }
@@ -79,10 +82,10 @@ export class ArgumentValidationError extends CxsError {
 export class FileOperationError extends CxsError {
 	constructor(
 		public readonly filePath: string,
-		public readonly operation: string,
+		public readonly operation: "read" | "write" | "delete",
 		message: string,
 	) {
-		super(message);
+		super(`File ${operation} failed for "${filePath}": ${message}`);
 		this.name = "FileOperationError";
 	}
 }
