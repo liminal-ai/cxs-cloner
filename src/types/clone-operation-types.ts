@@ -24,10 +24,18 @@ export interface ResolvedCloneConfig {
 	sessionId: string;
 	codexDir: string;
 	outputPath: string | null;
+	targetCwd: string | null;
 	stripConfig: StripConfig;
 	force: boolean;
 	jsonOutput: boolean;
 	verbose: boolean;
+}
+
+export interface CloneIdentity {
+	threadId: string;
+	cloneTimestamp: Date;
+	threadName?: string;
+	sourceThreadId: string;
 }
 
 export interface CloneResult {
@@ -36,6 +44,10 @@ export interface CloneResult {
 	clonedSessionFilePath: string;
 	sourceThreadId: string;
 	sourceSessionFilePath: string;
+	cloneTimestamp: string;
+	cloneThreadName?: string;
+	targetCwdApplied?: string;
+	sessionIndexUpdated: boolean;
 	resumable: boolean;
 	statistics: CloneStatistics;
 }
@@ -93,12 +105,19 @@ export interface WriteSessionOptions {
 	outputPath: string | null;
 	codexDir: string;
 	threadId: string;
+	cloneTimestamp: Date;
 }
 
 export interface WriteResult {
 	filePath: string;
 	sizeBytes: number;
 	isDefaultLocation: boolean;
+}
+
+export interface SessionIndexEntry {
+	id: string;
+	thread_name: string;
+	updated_at: string;
 }
 
 export interface ScanOptions {

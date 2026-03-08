@@ -11,10 +11,14 @@ import type { RolloutLine } from "../types/codex-session-types.js";
 /**
  * Generate the default output path for a cloned session.
  * Format: {codexDir}/sessions/YYYY/MM/DD/rollout-<timestamp>-<threadId>.jsonl
- * Uses current date for the directory hierarchy.
+ * Uses the canonical clone timestamp for the directory hierarchy.
  */
-function generateDefaultPath(codexDir: string, threadId: string): string {
-	const now = new Date();
+function generateDefaultPath(
+	codexDir: string,
+	threadId: string,
+	cloneTimestamp: Date,
+): string {
+	const now = cloneTimestamp;
 	const year = now.getFullYear().toString();
 	const month = (now.getMonth() + 1).toString().padStart(2, "0");
 	const day = now.getDate().toString().padStart(2, "0");
@@ -48,7 +52,11 @@ export async function writeClonedSession(
 	const isDefaultLocation = options.outputPath === null;
 	const filePath =
 		options.outputPath === null
-			? generateDefaultPath(options.codexDir, options.threadId)
+			? generateDefaultPath(
+					options.codexDir,
+					options.threadId,
+					options.cloneTimestamp,
+				)
 			: options.outputPath;
 
 	// Create parent directories

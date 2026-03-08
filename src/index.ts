@@ -22,6 +22,7 @@ export { identifyTurns } from "./core/turn-boundary-calculator.js";
 export {
 	AmbiguousMatchError,
 	ArgumentValidationError,
+	CloneCompatibilityError,
 	ConfigurationError,
 	CxsError,
 	FileOperationError,
@@ -45,10 +46,12 @@ export {
 	formatSessionList,
 } from "./output/session-formatters.js";
 export {
-	DEFAULT_EVENT_PRESERVE_LIST,
+	NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 	TURN_CONTEXT_STRUCTURAL_FIELDS,
+	isReplayPreservedEvent,
 } from "./types/codex-session-types.js";
 export type {
+	CloneIdentity,
 	CloneResult,
 	CloneStatistics,
 	CompactedPayload,
@@ -75,6 +78,7 @@ export type {
 	RolloutPayload,
 	RolloutType,
 	ScanOptions,
+	SessionIndexEntry,
 	SessionFileInfo,
 	SessionMetadata,
 	SessionMetaPayload,

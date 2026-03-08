@@ -8,7 +8,10 @@ import type {
 	RolloutLine,
 	TurnContextPayload,
 } from "../types/codex-session-types.js";
-import { TURN_CONTEXT_STRUCTURAL_FIELDS } from "../types/codex-session-types.js";
+import {
+	TURN_CONTEXT_STRUCTURAL_FIELDS,
+	isReplayPreservedEvent,
+} from "../types/codex-session-types.js";
 import type { StripConfig, StripZone } from "../types/tool-removal-types.js";
 
 /** Response_item subtypes that are tool calls. */
@@ -189,7 +192,10 @@ export function stripRecords(
 			// 5a: Strip event_msg records not in preserve-list
 			if (record.type === "event_msg") {
 				const eventPayload = record.payload as EventMsgPayload;
-				if (!preserveSet.has(eventPayload.type)) {
+				if (
+					!preserveSet.has(eventPayload.type) &&
+					!isReplayPreservedEvent(eventPayload)
+				) {
 					indicesToRemove.add(i);
 					eventMessagesRemoved++;
 				}
@@ -445,7 +451,10 @@ function findEmptyTurnIndices(
 				}
 			} else if (record.type === "event_msg") {
 				const eventPayload = record.payload as EventMsgPayload;
-				if (preserveSet.has(eventPayload.type)) {
+				if (
+					preserveSet.has(eventPayload.type) ||
+					isReplayPreservedEvent(eventPayload)
+				) {
 					hasMessage = true;
 				}
 			}

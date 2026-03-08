@@ -76,8 +76,7 @@ describe("configuration-loader", () => {
 		expect(config.codexDir).toContain(".codex");
 		expect(config.defaultPreset).toBe("default");
 		expect(config.customPresets).toEqual({});
-		expect(config.eventPreserveList).toContain("user_message");
-		expect(config.eventPreserveList).toContain("error");
+		expect(config.eventPreserveList).toEqual([]);
 		expect(config.truncateLength).toBe(120);
 	});
 

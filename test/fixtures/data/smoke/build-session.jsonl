@@ -1,0 +1,100 @@
+{"timestamp":"2026-03-05T12:00:00.000Z","type":"session_meta","payload":{"id":"smoke-build-source-000000000000","timestamp":"2026-03-05T12:00:00.000Z","cwd":"/tmp/smoke-build","originator":"Codex","cli_version":"0.108.0","source":"vscode","model_provider":"openai"}}
+{"timestamp":"2026-03-05T12:00:01.000Z","type":"turn_context","payload":{"turn_id":"turn_0","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:00:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:00:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 0 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:00:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 0 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:00:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=0\"}","call_id":"call_0"}}
+{"timestamp":"2026-03-05T12:00:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_0","output":"Build step 0 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:00:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1200,"output_tokens":220}}
+{"timestamp":"2026-03-05T12:00:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 0 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:00:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:01:01.000Z","type":"turn_context","payload":{"turn_id":"turn_1","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:01:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:01:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 1 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:01:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 1 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:01:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=1\"}","call_id":"call_1"}}
+{"timestamp":"2026-03-05T12:01:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_1","output":"Build step 1 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:01:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1210,"output_tokens":222}}
+{"timestamp":"2026-03-05T12:01:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 1 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:01:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:02:01.000Z","type":"turn_context","payload":{"turn_id":"turn_2","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:02:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:02:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 2 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:02:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 2 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:02:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=2\"}","call_id":"call_2"}}
+{"timestamp":"2026-03-05T12:02:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_2","output":"Build step 2 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:02:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1220,"output_tokens":224}}
+{"timestamp":"2026-03-05T12:02:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 2 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:02:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:03:01.000Z","type":"turn_context","payload":{"turn_id":"turn_3","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:03:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:03:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 3 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:03:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 3 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:03:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=3\"}","call_id":"call_3"}}
+{"timestamp":"2026-03-05T12:03:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_3","output":"Build step 3 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:03:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1230,"output_tokens":226}}
+{"timestamp":"2026-03-05T12:03:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 3 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:03:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:04:01.000Z","type":"turn_context","payload":{"turn_id":"turn_4","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:04:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:04:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 4 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:04:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 4 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:04:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=4\"}","call_id":"call_4"}}
+{"timestamp":"2026-03-05T12:04:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_4","output":"Build step 4 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:04:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1240,"output_tokens":228}}
+{"timestamp":"2026-03-05T12:04:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 4 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:04:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:05:01.000Z","type":"turn_context","payload":{"turn_id":"turn_5","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:05:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:05:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 5 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:05:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 5 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:05:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=5\"}","call_id":"call_5"}}
+{"timestamp":"2026-03-05T12:05:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_5","output":"Build step 5 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:05:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1250,"output_tokens":230}}
+{"timestamp":"2026-03-05T12:05:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 5 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:05:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:06:01.000Z","type":"turn_context","payload":{"turn_id":"turn_6","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:06:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:06:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 6 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:06:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 6 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:06:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=6\"}","call_id":"call_6"}}
+{"timestamp":"2026-03-05T12:06:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_6","output":"Build step 6 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:06:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1260,"output_tokens":232}}
+{"timestamp":"2026-03-05T12:06:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 6 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:06:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:07:01.000Z","type":"turn_context","payload":{"turn_id":"turn_7","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:07:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:07:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 7 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:07:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 7 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:07:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=7\"}","call_id":"call_7"}}
+{"timestamp":"2026-03-05T12:07:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_7","output":"Build step 7 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:07:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1270,"output_tokens":234}}
+{"timestamp":"2026-03-05T12:07:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 7 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:07:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:08:01.000Z","type":"turn_context","payload":{"turn_id":"turn_8","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:08:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:08:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 8 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:08:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 8 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:08:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=8\"}","call_id":"call_8"}}
+{"timestamp":"2026-03-05T12:08:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_8","output":"Build step 8 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:08:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1280,"output_tokens":236}}
+{"timestamp":"2026-03-05T12:08:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 8 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:08:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:09:01.000Z","type":"turn_context","payload":{"turn_id":"turn_9","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:09:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:09:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 9 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:09:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 9 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:09:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=9\"}","call_id":"call_9"}}
+{"timestamp":"2026-03-05T12:09:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_9","output":"Build step 9 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:09:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1290,"output_tokens":238}}
+{"timestamp":"2026-03-05T12:09:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 9 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:09:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}
+{"timestamp":"2026-03-05T12:10:01.000Z","type":"turn_context","payload":{"turn_id":"turn_10","cwd":"/tmp/smoke-build","model":"gpt-5.4","approval_policy":{"mode":"auto"},"sandbox_policy":{"mode":"danger-full-access"},"summary":null}}
+{"timestamp":"2026-03-05T12:10:02.000Z","type":"event_msg","payload":{"type":"turn_started"}}
+{"timestamp":"2026-03-05T12:10:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Implement build step 10 for the smoke CLI."}]}}
+{"timestamp":"2026-03-05T12:10:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Implement build step 10 for the smoke CLI."}}
+{"timestamp":"2026-03-05T12:10:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"npm test -- --turn=10\"}","call_id":"call_10"}}
+{"timestamp":"2026-03-05T12:10:05.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_10","output":"Build step 10 verification output that is intentionally verbose so aggressive presets have something to truncate for smoke coverage."}}
+{"timestamp":"2026-03-05T12:10:06.000Z","type":"event_msg","payload":{"type":"token_count","input_tokens":1300,"output_tokens":240}}
+{"timestamp":"2026-03-05T12:10:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Build step 10 completed with a replay-visible assistant update."}}
+{"timestamp":"2026-03-05T12:10:08.000Z","type":"event_msg","payload":{"type":"turn_complete"}}

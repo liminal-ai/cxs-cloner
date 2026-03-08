@@ -89,3 +89,10 @@ export class FileOperationError extends CxsError {
 		this.name = "FileOperationError";
 	}
 }
+
+export class CloneCompatibilityError extends CxsError {
+	constructor(message: string) {
+		super(`Clone compatibility error: ${message}`);
+		this.name = "CloneCompatibilityError";
+	}
+}

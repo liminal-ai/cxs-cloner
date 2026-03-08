@@ -191,10 +191,42 @@ export interface EventMsgPayload {
 	[key: string]: unknown;
 }
 
-export const DEFAULT_EVENT_PRESERVE_LIST: readonly string[] = [
+export const NATIVE_LIMITED_EVENT_PRESERVE_LIST: readonly string[] = [
 	"user_message",
-	"error",
+	"agent_message",
+	"agent_reasoning",
+	"agent_reasoning_raw_content",
+	"token_count",
+	"context_compacted",
+	"entered_review_mode",
+	"exited_review_mode",
+	"thread_rolled_back",
+	"undo_completed",
+	"turn_aborted",
+	"turn_started",
+	"turn_complete",
 ] as const;
+
+export function isReplayPreservedEvent(payload: EventMsgPayload): boolean {
+	if (NATIVE_LIMITED_EVENT_PRESERVE_LIST.includes(payload.type)) {
+		return true;
+	}
+
+	return payload.type === "item_completed" && hasPlanItem(payload);
+}
+
+function hasPlanItem(payload: EventMsgPayload): boolean {
+	if (
+		!("item" in payload) ||
+		!payload.item ||
+		typeof payload.item !== "object"
+	) {
+		return false;
+	}
+
+	const item = payload.item as { type?: unknown };
+	return item.type === "plan";
+}
 
 // Compacted
 export interface CompactedPayload {

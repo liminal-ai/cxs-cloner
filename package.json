@@ -14,13 +14,15 @@
 		"lint": "biome lint src test",
 		"check": "biome check src test",
 		"typecheck": "tsc --noEmit",
-		"test": "bun test",
+		"test": "bun test $(find test -name '*.test.ts' -print)",
+		"test:smoke": "bun test test/smoke",
 		"red-verify": "bun run format:check && bun run lint && bun run typecheck",
-		"verify": "bun run format:check && bun run lint && bun run typecheck && bun test",
+		"verify": "bun run format:check && bun run lint && bun run typecheck && bun run test",
 		"guard:no-test-changes": "git diff --name-only test/ | grep . && echo 'ERROR: Test files were modified during Green phase' && exit 1 || true",
 		"green-verify": "bun run verify && bun run guard:no-test-changes",
 		"verify-all": "bun run verify",
-		"build": "bun build ./src/cli.ts --outdir ./dist --target node --external c12 --external node-fetch-native"
+		"build": "bun build ./src/cli.ts --outdir ./dist --target node --external c12 --external node-fetch-native",
+		"smoke:refs": "node smoke-tests/list-reference-sessions.mjs"
 	},
 	"dependencies": {
 		"c12": "^3.3.3",

@@ -17,22 +17,15 @@ export function formatCloneResult(
 }
 
 function formatJson(result: CloneResult): string {
-	return JSON.stringify(
-		{
-			success: result.operationSucceeded,
-			clonedThreadId: result.clonedThreadId,
-			clonedSessionFilePath: result.clonedSessionFilePath,
-			sourceThreadId: result.sourceThreadId,
-			sourceSessionFilePath: result.sourceSessionFilePath,
-			resumable: result.resumable,
-			statistics: result.statistics,
-		},
-		null,
-		2,
-	);
+	const { operationSucceeded, ...rest } = result;
+	return JSON.stringify({ success: operationSucceeded, ...rest }, null, 2);
 }
 
 function formatHuman(result: CloneResult, verbose: boolean): string {
+	if (!result.operationSucceeded) {
+		return "Clone failed.";
+	}
+
 	const stats = result.statistics;
 	const lines: string[] = [];
 
@@ -41,6 +34,12 @@ function formatHuman(result: CloneResult, verbose: boolean): string {
 	lines.push(`  Source:  ${result.sourceSessionFilePath}`);
 	lines.push(`  Output:  ${result.clonedSessionFilePath}`);
 	lines.push(`  Thread:  ${result.clonedThreadId}`);
+	if (result.cloneThreadName) {
+		lines.push(`  Name:    ${result.cloneThreadName}`);
+	}
+	if (result.targetCwdApplied) {
+		lines.push(`  Target:  ${result.targetCwdApplied}`);
+	}
 	lines.push("");
 	lines.push(
 		`  Size: ${formatFileSize(stats.originalSizeBytes)} → ${formatFileSize(stats.outputSizeBytes)} (${stats.fileSizeReductionPercent}% reduction)`,
@@ -68,6 +67,10 @@ function formatHuman(result: CloneResult, verbose: boolean): string {
 		);
 	}
 
+	lines.push("");
+	lines.push(
+		`  Session index: ${result.sessionIndexUpdated ? "updated" : "not updated"}`,
+	);
 	lines.push("");
 
 	if (result.resumable) {

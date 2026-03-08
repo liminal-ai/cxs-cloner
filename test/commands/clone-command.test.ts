@@ -66,9 +66,92 @@ describe("clone-command", () => {
 		const parsed = JSON.parse(logs.join("\n")) as {
 			success: boolean;
 			clonedThreadId: string;
+			cloneTimestamp: string;
+			sessionIndexUpdated: boolean;
 		};
 		expect(parsed.success).toBe(true);
 		expect(parsed.clonedThreadId).toBeDefined();
+		expect(parsed.cloneTimestamp).toBeDefined();
+		expect(typeof parsed.sessionIndexUpdated).toBe("boolean");
+	});
+
+	it("rejects --target-cwd pointing to a non-existent path", async () => {
+		const codexDir = join(tmpDir, "codex-bad-cwd");
+		const threadId = "cccccccc-dddd-eeee-ffff-000000000000";
+		await writeSession(codexDir, threadId);
+
+		const errors: string[] = [];
+		const originalError = console.error;
+		console.error = (...args: unknown[]) => {
+			errors.push(args.map((arg) => String(arg)).join(" "));
+		};
+
+		let exitCode: number | undefined;
+		const originalExit = process.exit;
+		(process as { exit: (code?: number) => never }).exit = (code?: number) => {
+			exitCode = code;
+			throw new Error("process.exit called");
+		};
+
+		await expect(
+			cloneCommand.run!({
+				args: {
+					sessionId: threadId.slice(0, 8),
+					"codex-dir": codexDir,
+					"strip-tools": "true",
+					"target-cwd": "/nonexistent/path/that/does/not/exist",
+					json: false,
+					verbose: false,
+				},
+			} as never),
+		).rejects.toThrow("process.exit called");
+
+		console.error = originalError;
+		(process as { exit: (code?: number) => never }).exit = originalExit;
+
+		expect(exitCode).toBe(1);
+		expect(errors.join("\n")).toContain("not readable");
+	});
+
+	it("rejects --target-cwd pointing to a file instead of directory", async () => {
+		const codexDir = join(tmpDir, "codex-file-cwd");
+		const threadId = "dddddddd-eeee-ffff-0000-111111111111";
+		await writeSession(codexDir, threadId);
+
+		const filePath = join(tmpDir, "not-a-dir.txt");
+		await writeFile(filePath, "I am a file");
+
+		const errors: string[] = [];
+		const originalError = console.error;
+		console.error = (...args: unknown[]) => {
+			errors.push(args.map((arg) => String(arg)).join(" "));
+		};
+
+		let exitCode: number | undefined;
+		const originalExit = process.exit;
+		(process as { exit: (code?: number) => never }).exit = (code?: number) => {
+			exitCode = code;
+			throw new Error("process.exit called");
+		};
+
+		await expect(
+			cloneCommand.run!({
+				args: {
+					sessionId: threadId.slice(0, 8),
+					"codex-dir": codexDir,
+					"strip-tools": "true",
+					"target-cwd": filePath,
+					json: false,
+					verbose: false,
+				},
+			} as never),
+		).rejects.toThrow("process.exit called");
+
+		console.error = originalError;
+		(process as { exit: (code?: number) => never }).exit = originalExit;
+
+		expect(exitCode).toBe(1);
+		expect(errors.join("\n")).toContain("not a directory");
 	});
 
 	it("handles invalid arguments with error output and exit code 1", async () => {

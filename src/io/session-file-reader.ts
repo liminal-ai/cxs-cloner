@@ -6,6 +6,11 @@ import {
 	InvalidSessionError,
 	MalformedJsonError,
 } from "../errors/clone-operation-errors.js";
+import {
+	extractMessageText,
+	isBootstrapPrompt,
+	normalizeMessageText,
+} from "../core/message-text-utils.js";
 import type {
 	ParsedSession,
 	ParseOptions,
@@ -31,21 +36,6 @@ export const METADATA_READ_LINES = 100;
 
 /** Maximum length for first user message before truncation. */
 export const MAX_MESSAGE_LENGTH = 80;
-
-/**
- * Extract text content from a MessagePayload.
- * Concatenates all text items from the content array.
- */
-function extractMessageText(payload: MessagePayload): string {
-	return payload.content
-		.map((item) => {
-			if ("text" in item) {
-				return item.text;
-			}
-			return "";
-		})
-		.join("");
-}
 
 /**
  * Truncate a string to the maximum message length.
@@ -113,7 +103,7 @@ export async function readSessionMetadata(
 	}
 
 	let sessionMeta: SessionMetaPayload | null = null;
-	let firstUserMessage: string | undefined;
+	let firstResponseItemMessage: string | undefined;
 	let firstEventMessage: string | undefined;
 
 	for (let i = 0; i < lines.length; i++) {
@@ -139,12 +129,20 @@ export async function readSessionMetadata(
 			sessionMeta = record.payload as SessionMetaPayload;
 		}
 
-		// Extract first user message from response_item
-		if (record.type === "response_item" && firstUserMessage === undefined) {
+		// Extract first user message from response_item (preferred source)
+		if (
+			record.type === "response_item" &&
+			firstResponseItemMessage === undefined
+		) {
 			const payload = record.payload as { type?: string; role?: string };
 			if (payload.type === "message" && payload.role === "user") {
 				const msgPayload = record.payload as MessagePayload;
-				firstUserMessage = truncateMessage(extractMessageText(msgPayload));
+				const messageText = normalizeMessageText(
+					extractMessageText(msgPayload),
+				);
+				if (messageText !== "" && !isBootstrapPrompt(messageText)) {
+					firstResponseItemMessage = truncateMessage(messageText);
+				}
 			}
 		}
 
@@ -153,8 +151,11 @@ export async function readSessionMetadata(
 			const payload = record.payload as EventMsgPayload;
 			if (payload.type === "user_message") {
 				const rawMessage = payload.message;
-				const message = typeof rawMessage === "string" ? rawMessage : undefined;
-				if (message) {
+				const message =
+					typeof rawMessage === "string"
+						? normalizeMessageText(rawMessage)
+						: undefined;
+				if (message && message !== "" && !isBootstrapPrompt(message)) {
 					firstEventMessage = truncateMessage(message);
 				}
 			}
@@ -165,8 +166,8 @@ export async function readSessionMetadata(
 		throw new InvalidSessionError(filePath, "No session_meta record found");
 	}
 
-	// Use response_item user message, fall back to event_msg
-	const resolvedMessage = firstUserMessage ?? firstEventMessage;
+	// Prefer response_item user message; fall back to event_msg
+	const firstUserMessage = firstResponseItemMessage ?? firstEventMessage;
 
 	const git: GitInfo | undefined = sessionMeta.git
 		? {
@@ -185,7 +186,7 @@ export async function readSessionMetadata(
 		cliVersion: sessionMeta.cli_version,
 		modelProvider: sessionMeta.model_provider,
 		git,
-		firstUserMessage: resolvedMessage,
+		firstUserMessage,
 		fileSizeBytes,
 	};
 }

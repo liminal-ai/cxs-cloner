@@ -12,7 +12,7 @@ import type {
 	RolloutLine,
 	TurnContextPayload,
 } from "../../src/types/codex-session-types.js";
-import { DEFAULT_EVENT_PRESERVE_LIST } from "../../src/types/codex-session-types.js";
+import { NATIVE_LIMITED_EVENT_PRESERVE_LIST } from "../../src/types/codex-session-types.js";
 import type { StripConfig } from "../../src/types/tool-removal-types.js";
 import { SessionBuilder } from "../fixtures/builders/session-builder.js";
 
@@ -24,7 +24,7 @@ function toolStripConfig(overrides?: Partial<StripConfig>): StripConfig {
 		toolPreset: { keepTurnsWithTools: 20, truncatePercent: 50 },
 		reasoningMode: "full",
 		stripTools: true,
-		eventPreserveList: DEFAULT_EVENT_PRESERVE_LIST,
+		eventPreserveList: NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 		truncateLength: 120,
 		...overrides,
 	};
@@ -36,7 +36,7 @@ function reasoningOnlyConfig(overrides?: Partial<StripConfig>): StripConfig {
 		toolPreset: null,
 		reasoningMode: "full",
 		stripTools: false,
-		eventPreserveList: DEFAULT_EVENT_PRESERVE_LIST,
+		eventPreserveList: NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 		truncateLength: 120,
 		...overrides,
 	};
@@ -578,11 +578,25 @@ describe("record-stripper", () => {
 			).toBe(0);
 		});
 
-		it("TC-7.1.2: preserves user_message events", () => {
+		it("TC-7.1.2: preserves native replay events", () => {
 			const builder = new SessionBuilder().addSessionMeta();
 			builder.addTurn({
 				functionCalls: 1,
-				events: ["user_message"],
+				events: [
+					"user_message",
+					"agent_message",
+					"agent_reasoning",
+					"agent_reasoning_raw_content",
+					"token_count",
+					"context_compacted",
+					"entered_review_mode",
+					"exited_review_mode",
+					"thread_rolled_back",
+					"undo_completed",
+					"turn_aborted",
+					"turn_started",
+					"turn_complete",
+				],
 			});
 			const records = builder.build();
 			const config = toolStripConfig();
@@ -590,35 +604,112 @@ describe("record-stripper", () => {
 			const result = stripSession(records, config);
 
 			expect(countEventsBySubtype(result.records, "user_message")).toBe(1);
+			expect(countEventsBySubtype(result.records, "agent_message")).toBe(1);
+			expect(countEventsBySubtype(result.records, "agent_reasoning")).toBe(1);
+			expect(
+				countEventsBySubtype(result.records, "agent_reasoning_raw_content"),
+			).toBe(1);
+			expect(countEventsBySubtype(result.records, "token_count")).toBe(1);
+			expect(countEventsBySubtype(result.records, "context_compacted")).toBe(1);
+			expect(countEventsBySubtype(result.records, "entered_review_mode")).toBe(
+				1,
+			);
+			expect(countEventsBySubtype(result.records, "exited_review_mode")).toBe(
+				1,
+			);
+			expect(countEventsBySubtype(result.records, "thread_rolled_back")).toBe(
+				1,
+			);
+			expect(countEventsBySubtype(result.records, "undo_completed")).toBe(1);
+			expect(countEventsBySubtype(result.records, "turn_aborted")).toBe(1);
+			expect(countEventsBySubtype(result.records, "turn_started")).toBe(1);
+			expect(countEventsBySubtype(result.records, "turn_complete")).toBe(1);
 		});
 
-		it("TC-7.1.3: preserves error events", () => {
+		it("TC-7.1.3: preserves item_completed for plan items only", () => {
+			const records: RolloutLine[] = [
+				{
+					timestamp: "2025-01-15T10:00:00.000Z",
+					type: "session_meta",
+					payload: {
+						id: "test-thread",
+						timestamp: "2025-01-15T10:00:00.000Z",
+						cwd: "/tmp/test-project",
+						originator: "test",
+						cli_version: "1.0.0",
+						source: "test-builder",
+					},
+				},
+				{
+					timestamp: "2025-01-15T10:00:01.000Z",
+					type: "turn_context",
+					payload: {
+						turn_id: "turn_0",
+						cwd: "/tmp/test-project",
+						model: "o4-mini",
+						approval_policy: { mode: "auto" },
+						sandbox_policy: { mode: "off" },
+						summary: null,
+					} as TurnContextPayload,
+				},
+				{
+					timestamp: "2025-01-15T10:00:02.000Z",
+					type: "response_item",
+					payload: {
+						type: "message",
+						role: "user",
+						content: [{ type: "input_text", text: "hello" }],
+					},
+				},
+				{
+					timestamp: "2025-01-15T10:00:03.000Z",
+					type: "event_msg",
+					payload: {
+						type: "item_completed",
+						item: { type: "plan", text: "Do the thing" },
+					},
+				},
+				{
+					timestamp: "2025-01-15T10:00:04.000Z",
+					type: "event_msg",
+					payload: {
+						type: "item_completed",
+						item: { type: "agent_message", text: "Done" },
+					},
+				},
+			];
+
+			const result = stripSession(records, toolStripConfig());
+
+			expect(countEventsBySubtype(result.records, "item_completed")).toBe(1);
+			const preserved = result.records.find(
+				(record) =>
+					record.type === "event_msg" &&
+					(record.payload as EventMsgPayload).type === "item_completed",
+			);
+			expect(
+				(preserved!.payload as { item?: { type?: string } }).item?.type,
+			).toBe("plan");
+		});
+
+		it("TC-7.1.4: removes non-native non-configured events", () => {
 			const builder = new SessionBuilder().addSessionMeta();
 			builder.addTurn({
 				functionCalls: 1,
-				events: ["error"],
+				events: ["exec_command_begin", "agent_message_delta", "error"],
 			});
 			const records = builder.build();
 			const config = toolStripConfig();
 
 			const result = stripSession(records, config);
 
-			expect(countEventsBySubtype(result.records, "error")).toBe(1);
-		});
-
-		it("TC-7.1.4: removes non-preserve-list events", () => {
-			const builder = new SessionBuilder().addSessionMeta();
-			builder.addTurn({
-				functionCalls: 1,
-				events: ["token_count", "agent_reasoning"],
-			});
-			const records = builder.build();
-			const config = toolStripConfig();
-
-			const result = stripSession(records, config);
-
-			expect(countEventsBySubtype(result.records, "token_count")).toBe(0);
-			expect(countEventsBySubtype(result.records, "agent_reasoning")).toBe(0);
+			expect(countEventsBySubtype(result.records, "exec_command_begin")).toBe(
+				0,
+			);
+			expect(countEventsBySubtype(result.records, "agent_message_delta")).toBe(
+				0,
+			);
+			expect(countEventsBySubtype(result.records, "error")).toBe(0);
 		});
 	});
 
@@ -730,20 +821,19 @@ describe("record-stripper", () => {
 			const builder = new SessionBuilder().addSessionMeta();
 			builder.addTurn({
 				functionCalls: 1,
-				events: ["agent_message", "user_message", "token_count"],
+				events: ["error", "user_message", "token_count"],
 			});
 			const records = builder.build();
 			const config = toolStripConfig({
-				eventPreserveList: ["user_message", "error", "agent_message"],
+				eventPreserveList: [...NATIVE_LIMITED_EVENT_PRESERVE_LIST, "error"],
 			});
 
 			const result = stripSession(records, config);
 
-			// user_message and agent_message preserved
+			// user_message/token_count preserved by native floor, error by config
 			expect(countEventsBySubtype(result.records, "user_message")).toBe(1);
-			expect(countEventsBySubtype(result.records, "agent_message")).toBe(1);
-			// token_count still stripped
-			expect(countEventsBySubtype(result.records, "token_count")).toBe(0);
+			expect(countEventsBySubtype(result.records, "token_count")).toBe(1);
+			expect(countEventsBySubtype(result.records, "error")).toBe(1);
 		});
 	});
 
