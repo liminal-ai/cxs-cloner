@@ -47,6 +47,19 @@ function extractMessageText(payload: MessagePayload): string {
 		.join("");
 }
 
+function normalizeMessageText(text: string): string {
+	return text.replace(/\s+/g, " ").trim();
+}
+
+function isBootstrapPrompt(text: string): boolean {
+	const normalized = normalizeMessageText(text);
+	return (
+		normalized.startsWith("# AGENTS.md instructions for ") ||
+		(normalized.includes("<INSTRUCTIONS>") &&
+			normalized.includes("<environment_context>"))
+	);
+}
+
 /**
  * Truncate a string to the maximum message length.
  * If truncation is needed, appends "..." to stay within the limit.
@@ -114,7 +127,6 @@ export async function readSessionMetadata(
 
 	let sessionMeta: SessionMetaPayload | null = null;
 	let firstUserMessage: string | undefined;
-	let firstEventMessage: string | undefined;
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
@@ -144,18 +156,26 @@ export async function readSessionMetadata(
 			const payload = record.payload as { type?: string; role?: string };
 			if (payload.type === "message" && payload.role === "user") {
 				const msgPayload = record.payload as MessagePayload;
-				firstUserMessage = truncateMessage(extractMessageText(msgPayload));
+				const messageText = normalizeMessageText(
+					extractMessageText(msgPayload),
+				);
+				if (messageText !== "" && !isBootstrapPrompt(messageText)) {
+					firstUserMessage = truncateMessage(messageText);
+				}
 			}
 		}
 
-		// Track first event_msg user_message as fallback
-		if (record.type === "event_msg" && firstEventMessage === undefined) {
+		// Track first event_msg user_message as fallback.
+		if (record.type === "event_msg" && firstUserMessage === undefined) {
 			const payload = record.payload as EventMsgPayload;
 			if (payload.type === "user_message") {
 				const rawMessage = payload.message;
-				const message = typeof rawMessage === "string" ? rawMessage : undefined;
-				if (message) {
-					firstEventMessage = truncateMessage(message);
+				const message =
+					typeof rawMessage === "string"
+						? normalizeMessageText(rawMessage)
+						: undefined;
+				if (message && message !== "" && !isBootstrapPrompt(message)) {
+					firstUserMessage = truncateMessage(message);
 				}
 			}
 		}
@@ -164,9 +184,6 @@ export async function readSessionMetadata(
 	if (!sessionMeta) {
 		throw new InvalidSessionError(filePath, "No session_meta record found");
 	}
-
-	// Use response_item user message, fall back to event_msg
-	const resolvedMessage = firstUserMessage ?? firstEventMessage;
 
 	const git: GitInfo | undefined = sessionMeta.git
 		? {
@@ -185,7 +202,7 @@ export async function readSessionMetadata(
 		cliVersion: sessionMeta.cli_version,
 		modelProvider: sessionMeta.model_provider,
 		git,
-		firstUserMessage: resolvedMessage,
+		firstUserMessage,
 		fileSizeBytes,
 	};
 }

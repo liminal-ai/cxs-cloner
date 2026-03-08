@@ -175,6 +175,51 @@ describe("session-file-reader", () => {
 		expect(metadata.firstUserMessage).toBe(eventMessage);
 	});
 
+	it("skips bootstrap AGENTS/environment prompts when selecting first user message", async () => {
+		const filePath = await writeSessionFile(tmpDir, "bootstrap-session.jsonl", [
+			{
+				timestamp: "2026-02-28T14:30:00.000Z",
+				type: "session_meta",
+				payload: {
+					id: "test-id",
+					timestamp: "2026-02-28T14:30:00.000Z",
+					cwd: "/tmp",
+					originator: "test",
+					cli_version: "1.0.0",
+					source: "test",
+				},
+			} satisfies RolloutLine,
+			{
+				timestamp: "2026-02-28T14:30:01.000Z",
+				type: "response_item",
+				payload: {
+					type: "message",
+					role: "user",
+					content: [
+						{
+							type: "input_text",
+							text: "# AGENTS.md instructions for /tmp/project\n\n<INSTRUCTIONS>\n...\n</INSTRUCTIONS>\n<environment_context>\n...\n</environment_context>",
+						},
+					],
+				},
+			} satisfies RolloutLine,
+			{
+				timestamp: "2026-02-28T14:30:02.000Z",
+				type: "event_msg",
+				payload: {
+					type: "user_message",
+					message: "Build a bounded CLI in this directory.",
+				},
+			} satisfies RolloutLine,
+		]);
+
+		const metadata = await readSessionMetadata(filePath);
+
+		expect(metadata.firstUserMessage).toBe(
+			"Build a bounded CLI in this directory.",
+		);
+	});
+
 	it("TC-3.3.1: skips malformed JSON with warning in non-strict mode", async () => {
 		const filePath = await writeSessionFile(tmpDir, "session.jsonl", [
 			{

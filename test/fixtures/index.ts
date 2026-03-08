@@ -8,6 +8,11 @@ export function fixtureDataPath(filename: string): string {
 	return resolve(__dirname, "data", filename);
 }
 
+/** Resolve a path relative to the reduced smoke fixtures directory. */
+export function smokeFixtureDataPath(filename: string): string {
+	return fixtureDataPath(`smoke/${filename}`);
+}
+
 /** Read a JSONL fixture file and parse each line into a RolloutLine. */
 export async function readFixtureSession(
 	filename: string,
@@ -26,4 +31,11 @@ export async function readFixtureSession(
 				);
 			}
 		});
+}
+
+/** Read a reduced smoke fixture session. */
+export async function readSmokeFixtureSession(
+	filename: string,
+): Promise<RolloutLine[]> {
+	return readFixtureSession(`smoke/${filename}`);
 }

@@ -24,6 +24,9 @@ function formatJson(result: CloneResult): string {
 			clonedSessionFilePath: result.clonedSessionFilePath,
 			sourceThreadId: result.sourceThreadId,
 			sourceSessionFilePath: result.sourceSessionFilePath,
+			cloneTimestamp: result.cloneTimestamp,
+			cloneThreadName: result.cloneThreadName,
+			sessionIndexUpdated: result.sessionIndexUpdated,
 			resumable: result.resumable,
 			statistics: result.statistics,
 		},
@@ -41,6 +44,9 @@ function formatHuman(result: CloneResult, verbose: boolean): string {
 	lines.push(`  Source:  ${result.sourceSessionFilePath}`);
 	lines.push(`  Output:  ${result.clonedSessionFilePath}`);
 	lines.push(`  Thread:  ${result.clonedThreadId}`);
+	if (result.cloneThreadName) {
+		lines.push(`  Name:    ${result.cloneThreadName}`);
+	}
 	lines.push("");
 	lines.push(
 		`  Size: ${formatFileSize(stats.originalSizeBytes)} → ${formatFileSize(stats.outputSizeBytes)} (${stats.fileSizeReductionPercent}% reduction)`,
@@ -68,6 +74,10 @@ function formatHuman(result: CloneResult, verbose: boolean): string {
 		);
 	}
 
+	lines.push("");
+	lines.push(
+		`  Session index: ${result.sessionIndexUpdated ? "updated" : "not updated"}`,
+	);
 	lines.push("");
 
 	if (result.resumable) {

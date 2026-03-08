@@ -2,7 +2,7 @@
 
 ## Objective
 
-After this story ships, the core stripping engine works: zone-based tool stripping with configurable presets, tool call removal with correct pairing, output truncation in the truncated zone, reasoning stripping (full/summary-only/none), telemetry event stripping per preserve-list, `turn_context` instruction stripping, ghost_snapshot removal, and empty turn cleanup. The preset system resolves built-in and custom presets.
+After this story ships, the core stripping engine works: zone-based tool stripping with configurable presets, tool call removal with correct pairing, output truncation in the truncated zone, reasoning stripping (full/summary-only/none), replay-compatible `event_msg` preservation with additive extras, `turn_context` instruction stripping, ghost_snapshot removal, and empty turn cleanup. The preset system resolves built-in and custom presets.
 
 ## Scope
 
@@ -17,8 +17,8 @@ After this story ships, the core stripping engine works: zone-based tool strippi
 - Tool output truncation in truncated zone (string and `ContentItem[]` forms)
 - `function_call` arguments truncation (parse JSON string, truncate string values, re-serialize)
 - Reasoning stripping: `full` (remove all), `summary-only` (keep summary, drop content/encrypted_content), `none` (preserve)
-- Telemetry `event_msg` stripping per preserve-list (preserve `user_message` and `error`, strip all others)
-- Configurable event preserve-list override
+- Native replay `event_msg` preservation floor based on Codex's limited persisted-event policy
+- Configurable additive event preserve-list override
 - `turn_context` stripping: removed/truncated zones → remove entirely; preserved zone → keep structural fields, strip instruction fields
 - `ghost_snapshot` removal
 - Empty turn removal (turns with no remaining content after stripping)
@@ -140,22 +140,22 @@ After this story ships, the core stripping engine works: zone-based tool strippi
   - When: Stripping is active
   - Then: The record is preserved (it is a compaction artifact, not reasoning)
 
-**AC-7.1:** When tool stripping is active, the system SHALL remove telemetry `event_msg` records.
+**AC-7.1:** When tool stripping is active, the system SHALL preserve Codex replay-relevant `event_msg` records and strip non-native events by default.
 
 - **TC-7.1.1: exec_command events removed**
   - Given: `event_msg` records with subtypes `exec_command_begin`, `exec_command_end`, `exec_command_output_delta`
   - When: Stripping is active
   - Then: These records are removed
-- **TC-7.1.2: user_message events preserved**
-  - Given: `event_msg` records with subtype `user_message`
+- **TC-7.1.2: Native replay events preserved**
+  - Given: `event_msg` records with native replay subtypes such as `user_message`, `agent_message`, `turn_started`, `turn_complete`, and `context_compacted`
   - When: Stripping is active
   - Then: These records are preserved
-- **TC-7.1.3: error events preserved**
-  - Given: `event_msg` records with subtype `error`
+- **TC-7.1.3: item_completed preserved only for Plan items**
+  - Given: `event_msg` records with subtype `item_completed`
   - When: Stripping is active
-  - Then: These records are preserved
-- **TC-7.1.4: Non-preserve-list events removed**
-  - Given: `event_msg` records with subtypes not in the preserve list (`token_count`, `agent_reasoning`, etc.)
+  - Then: Plan completions are preserved, and non-Plan item completions are removed unless explicitly added via config
+- **TC-7.1.4: Non-native non-configured events removed**
+  - Given: `event_msg` records with subtypes outside the native replay floor and not explicitly configured (for example `agent_message_delta`)
   - When: Stripping is active
   - Then: These records are removed
 
@@ -192,12 +192,12 @@ After this story ships, the core stripping engine works: zone-based tool strippi
   - When: `--strip-tools` is used without a preset name
   - Then: The `aggressive` preset is applied instead of `default`
 
-**AC-9.3:** The system SHALL support an `event_msg` preserve-list override in configuration.
+**AC-9.3:** The system SHALL support an additive `event_msg` preserve-list override in configuration.
 
 - **TC-9.3.1: Custom preserve-list augments defaults**
-  - Given: A config with `eventPreserveList: ["user_message", "error", "agent_message"]`
+  - Given: A config with `eventPreserveList: ["error"]`
   - When: Stripping is active
-  - Then: `agent_message` events are preserved in addition to the built-in defaults
+  - Then: `error` events are preserved in addition to the built-in native replay floor
 
 **AC-10.1:** The system SHALL detect and preserve compacted records in the output.
 
@@ -457,7 +457,7 @@ export interface StripResult {
 
 // src/types/codex-session-types.ts
 export const TURN_CONTEXT_STRUCTURAL_FIELDS = [...] as const;
-export const DEFAULT_EVENT_PRESERVE_LIST: readonly string[] = [...] as const;
+export const NATIVE_LIMITED_EVENT_PRESERVE_LIST: readonly string[] = [...] as const;
 
 // src/config/tool-removal-presets.ts
 export const DEFAULT_TRUNCATE_LENGTH = 120;

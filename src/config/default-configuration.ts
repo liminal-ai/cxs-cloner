@@ -6,7 +6,6 @@
 
 import { homedir } from "node:os";
 import { join } from "pathe";
-import { DEFAULT_EVENT_PRESERVE_LIST } from "../types/codex-session-types.js";
 import type { CxsConfiguration } from "../types/configuration-types.js";
 import { DEFAULT_TRUNCATE_LENGTH } from "./tool-removal-presets.js";
 
@@ -15,7 +14,7 @@ export const DEFAULT_CONFIGURATION: CxsConfiguration = {
 	codexDir: join(homedir(), ".codex"),
 	defaultPreset: "default",
 	customPresets: {},
-	eventPreserveList: [...DEFAULT_EVENT_PRESERVE_LIST],
+	eventPreserveList: [],
 	truncateLength: DEFAULT_TRUNCATE_LENGTH,
 };
 

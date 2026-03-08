@@ -218,11 +218,13 @@ sequenceDiagram
 
 4. **Strip records:** Uses `stripRecords` from Story 4. Passes turns, pre-turn range, and `StripConfig`. Returns `StripResult` with stripped records and partial statistics (per-type removal counts, turn counts, compaction info — but NOT file-size fields).
 
-5. **Generate new identity:** `crypto.randomUUID()` for the new thread ID. Update `session_meta` record: set `payload.id` to new UUID, set `forked_from_id` to source session's thread ID, preserve all other fields (`cwd`, `git`, `model_provider`, etc.).
+5. **Generate new identity:** `crypto.randomUUID()` for the new thread ID. Capture one canonical clone timestamp and use it everywhere. Update `session_meta` record: set `payload.id` to the new UUID, set `forked_from_id` to the source session's thread ID, rewrite both `payload.timestamp` and the session_meta envelope timestamp to the clone time, and preserve all other fields (`cwd`, `git`, `model_provider`, etc.).
 
-6. **Write output:** The writer accepts `WriteSessionOptions` (outputPath, codexDir, threadId). When `outputPath` is null, generates default path: `{codexDir}/sessions/YYYY/MM/DD/rollout-<timestamp>-<threadId>.jsonl`. Creates date hierarchy via `mkdir -p`. Writes via atomic temp-file-then-rename pattern. Returns `WriteResult` with `filePath`, `sizeBytes`, and `isDefaultLocation`.
+6. **Write output:** The writer accepts `WriteSessionOptions` (outputPath, codexDir, threadId, cloneTimestamp). When `outputPath` is null, generates default path: `{codexDir}/sessions/YYYY/MM/DD/rollout-<timestamp>-<threadId>.jsonl` from the canonical clone timestamp. Creates date hierarchy via `mkdir -p`. Writes via atomic temp-file-then-rename pattern. Returns `WriteResult` with `filePath`, `sizeBytes`, and `isDefaultLocation`.
 
-7. **Merge statistics:** Combine `StripResult.statistics` (per-type removal counts) with file-size fields: `originalSizeBytes` from `ParsedSession.fileSizeBytes`, `outputSizeBytes` from `WriteResult.sizeBytes`, `fileSizeReductionPercent` computed from both.
+7. **Append name index when appropriate:** For default-location clones, derive a clone name from the source session's `session_index.jsonl` entry when available, otherwise fall back to the first user message. Append a native-style `session_index.jsonl` entry for the cloned thread. If this append fails, remove the just-written rollout and fail the operation so the clone does not land half-updated.
+
+8. **Merge statistics:** Combine `StripResult.statistics` (per-type removal counts) with file-size fields: `originalSizeBytes` from `ParsedSession.fileSizeBytes`, `outputSizeBytes` from `WriteResult.sizeBytes`, `fileSizeReductionPercent` computed from both.
 
 **Resume Guarantee:**
 
@@ -231,9 +233,10 @@ The resume command is displayed only when the clone is written to the default Co
 Resumability depends on:
 1. Writing to `~/.codex/sessions/YYYY/MM/DD/` hierarchy
 2. Using the correct filename convention (`rollout-<timestamp>-<uuid>.jsonl`)
-3. Preserving `session_meta` as the first record with updated thread ID
-4. Preserving `user_message` event records (via the preserve-list in Story 4)
-5. Every output line being valid JSON
+3. Preserving `session_meta` as the first record with updated thread ID and clone timestamp
+4. Preserving an existing `user_message` event when present, or synthesizing exactly one as a fallback only when the clone would otherwise be undiscoverable
+5. Appending `session_index.jsonl` for default-location clones when a clone name can be derived
+6. Every output line being valid JSON
 
 **Atomic Write Pattern:**
 

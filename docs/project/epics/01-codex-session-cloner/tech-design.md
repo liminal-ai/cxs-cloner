@@ -31,7 +31,7 @@ Before designing, I validated the epic as downstream consumer — can I map ever
 
 | # | Issue | Spec Location | Severity | Recommendation | Status |
 |---|-------|---------------|----------|----------------|--------|
-| V1 | Resume requires `event_msg` of subtype `user_message`, not `response_item` with user role | AC-8.3.1 | Minor | TC-8.3.1 is an integration/manual test. The clone preserves `user_message` events via the preserve-list (AC-7.1), so resumability is maintained. Document this dependency explicitly in the test plan — the resume guarantee flows through the preserve-list, not through response_item preservation. | Resolved |
+| V1 | Resume/display reconstruction depends on persisted `event_msg` replay history, not only `response_item` messages | AC-7.1, AC-8.3.1 | Major | Align the default event floor with Codex's native limited persisted-event policy. `user_message` alone is insufficient for visible history replay. | Resolved |
 | V2 | EventMsg wire names: canonical v1 names are `task_started`/`task_complete`, not `turn_started`/`turn_complete` | AC-7.1, tech overview | Minor | The epic's preserve-list doesn't include these (they're stripped), so functionality is unaffected. Types should use canonical v1 names with aliases. The `turn_started` alias accepted by the deserializer means either name works in input parsing. | Resolved |
 | V3 | TurnContext missing fields: `summary` (ReasoningSummaryConfig, NOT optional in source), `current_date`, `timezone`, `network` | Data Contracts — TurnContextPayload | Minor | These aren't strip targets so omission doesn't break stripping logic. But the type should include them for completeness — use index signature for unknown fields to stay forward-compatible. | Resolved |
 | V4 | `instructions` field in TurnContext: epic lists as strip target but not present in Codex Rust source | AC-7.2, TurnContextPayload | Minor | May exist in older session formats or be a mistake. Include it defensively as an optional strip target — if present, strip it; if absent, no harm. Real sessions will confirm. | Resolved |
@@ -563,9 +563,9 @@ This flow covers the most TCs. They're organized by sub-algorithm:
 | TC | Tests | Module | Setup | Assert |
 |----|-------|--------|-------|--------|
 | TC-7.1.1 | exec_command_* events → removed when active | `record-stripper` | Event records with exec subtypes | Records removed |
-| TC-7.1.2 | user_message events → preserved | `record-stripper` | user_message event | Record present |
-| TC-7.1.3 | error events → preserved | `record-stripper` | error event | Record present |
-| TC-7.1.4 | Non-preserve-list events → removed | `record-stripper` | token_count, agent_reasoning events | Records removed |
+| TC-7.1.2 | Native replay events → preserved | `record-stripper` | user_message, agent_message, turn_started, turn_complete, context_compacted | Records present |
+| TC-7.1.3 | item_completed(plan) → preserved, other item_completed → removed | `record-stripper` | item_completed with plan and non-plan payloads | Only plan preserved |
+| TC-7.1.4 | Non-native non-configured events → removed | `record-stripper` | agent_message_delta, exec_command_begin | Records removed |
 | TC-7.2.1 | turn_context in removed zone → removed | `record-stripper` | turn_context in removed zone | Record absent |
 | TC-7.2.2 | turn_context in truncated zone → removed | `record-stripper` | turn_context in truncated zone | Record absent |
 | TC-7.2.3 | turn_context in preserved zone → kept, instructions stripped | `record-stripper` | turn_context with user_instructions etc. | Structural fields present, instruction fields absent |
@@ -891,9 +891,13 @@ export interface EventMsgPayload {
   [key: string]: unknown;
 }
 
-export const DEFAULT_EVENT_PRESERVE_LIST: readonly string[] = [
+export const NATIVE_LIMITED_EVENT_PRESERVE_LIST: readonly string[] = [
   "user_message",
-  "error",
+  "agent_message",
+  "agent_reasoning",
+  "turn_started",
+  "turn_complete",
+  // ... full native limited replay set
 ] as const;
 
 // ─── Compacted ──────────────────────────────────────────────────
@@ -1551,7 +1555,7 @@ The largest test file. Organized by sub-algorithm:
 
 | TC | Test Name |
 |----|-----------|
-| TC-9.3.1 | TC-9.3.1: custom eventPreserveList augments built-in list |
+| TC-9.3.1 | TC-9.3.1: custom eventPreserveList augments native replay floor |
 
 #### `test/config/tool-removal-presets.test.ts`
 
@@ -1765,7 +1769,7 @@ Creates shared foundation. No TDD cycle — pure setup.
 | Deliverable | Path | Contents |
 |-------------|------|----------|
 | Error classes | `src/errors/clone-operation-errors.ts` | `NotImplementedError`, `CxsError`, `SessionNotFoundError`, `AmbiguousMatchError`, `InvalidSessionError`, `MalformedJsonError`, `ConfigurationError`, `ArgumentValidationError`, `FileOperationError` |
-| Codex session types | `src/types/codex-session-types.ts` | All record types, content types, payloads, constants (`TURN_CONTEXT_STRUCTURAL_FIELDS`, `DEFAULT_EVENT_PRESERVE_LIST`) |
+| Codex session types | `src/types/codex-session-types.ts` | All record types, content types, payloads, constants (`TURN_CONTEXT_STRUCTURAL_FIELDS`, `NATIVE_LIMITED_EVENT_PRESERVE_LIST`) |
 | Clone operation types | `src/types/clone-operation-types.ts` | `CloneResult`, `CloneStatistics`, `StripResult`, `ParsedSession`, `SessionFileInfo`, `SessionMetadata`, `TurnInfo`, `TurnIdentificationResult`, `ResolvedCloneConfig`, `WriteSessionOptions`, `WriteResult`, `ScanOptions`, `ParseOptions` |
 | Tool removal types | `src/types/tool-removal-types.ts` | `ToolRemovalPreset`, `StripConfig`, `StripZone`, `ReasoningMode` |
 | Configuration types | `src/types/configuration-types.ts` | `CxsConfiguration` |
@@ -2069,9 +2073,9 @@ Linear dependency chain. Each chunk builds on the previous. This is appropriate 
 |------|-----------|-----------------|-------------|
 | Compacted session preset calibration | AC-10.3 | Requires sample data | Story 7 (epic) |
 | Percentage-based stripping mode | AC-5.1 | Alternative approach, not MVP | Future enhancement |
-| SQLite session index | AC-1 | Filesystem discovery is sufficient | Out of scope |
+| SQLite session index | AC-1 | Filesystem discovery remains sufficient; direct DB writes still add coupling risk | Out of scope |
 | Archived session handling | — | Out of scope per epic | Not planned |
-| `session_index.jsonl` writing | — | Not needed for filesystem discovery | Out of scope |
+| `session_index.jsonl` writing | AC-1, AC-5 | Append-only file update improves native naming/display without DB mutation | In scope for default-location clones |
 
 ---
 

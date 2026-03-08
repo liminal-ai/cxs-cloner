@@ -1,0 +1,13 @@
+{"timestamp":"2026-03-01T10:00:00.000Z","type":"session_meta","payload":{"id":"sample-thread","timestamp":"2026-03-01T10:00:00.000Z","cwd":"/tmp/project","originator":"Codex","cli_version":"0.108.0","source":"vscode"}}
+{"timestamp":"2026-03-01T10:00:01.000Z","type":"turn_context","payload":{"turn_id":"turn_0","cwd":"/tmp/project","model":"gpt-5.4"}}
+{"timestamp":"2026-03-01T10:00:02.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"First prompt about summary quality and token estimates."}]}}
+{"timestamp":"2026-03-01T10:00:02.100Z","type":"event_msg","payload":{"type":"user_message","message":"First prompt about summary quality and token estimates."}}
+{"timestamp":"2026-03-01T10:00:03.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Initial answer for the first prompt."}]}}
+{"timestamp":"2026-03-01T10:00:04.000Z","type":"turn_context","payload":{"turn_id":"turn_1","cwd":"/tmp/project","model":"gpt-5.4"}}
+{"timestamp":"2026-03-01T10:00:05.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","call_id":"call_1","arguments":"{\"cmd\":\"ls\"}"}}
+{"timestamp":"2026-03-01T10:00:05.500Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_1","output":"src\nREADME.md"}}
+{"timestamp":"2026-03-01T10:00:06.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Tool-assisted follow-up complete with a concise wrap-up."}}
+{"timestamp":"2026-03-01T10:01:00.000Z","type":"turn_context","payload":{"turn_id":"turn_2","cwd":"/tmp/project","model":"gpt-5.4"}}
+{"timestamp":"2026-03-01T10:01:01.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Second prompt for follow-up with more detail than before."}]}}
+{"timestamp":"2026-03-01T10:01:01.100Z","type":"event_msg","payload":{"type":"user_message","message":"Second prompt for follow-up with more detail than before."}}
+{"timestamp":"2026-03-01T10:01:03.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Second answer final model output with more detail."}]}}

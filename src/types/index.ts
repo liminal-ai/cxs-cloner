@@ -1,10 +1,12 @@
 export type {
+	CloneIdentity,
 	CloneResult,
 	CloneStatistics,
 	ParsedSession,
 	ParseOptions,
 	ResolvedCloneConfig,
 	ScanOptions,
+	SessionIndexEntry,
 	SessionFileInfo,
 	SessionMetadata,
 	SessionStatistics,
@@ -40,8 +42,9 @@ export type {
 	WebSearchCallPayload,
 } from "./codex-session-types.js";
 export {
-	DEFAULT_EVENT_PRESERVE_LIST,
+	NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 	TURN_CONTEXT_STRUCTURAL_FIELDS,
+	isNativeLimitedEventPayload,
 } from "./codex-session-types.js";
 export type { CxsConfiguration } from "./configuration-types.js";
 export type {

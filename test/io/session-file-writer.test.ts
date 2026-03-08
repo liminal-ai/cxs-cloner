@@ -39,20 +39,21 @@ describe("writeClonedSession", () => {
 		const codexDir = await createTempDir();
 		const records = buildMinimalSession();
 		const threadId = "aaaabbbb-cccc-dddd-eeee-ffffffffffff";
+		const cloneTimestamp = new Date("2026-03-06T23:12:17.810Z");
 
 		const result = await writeClonedSession(records, {
 			outputPath: null,
 			codexDir,
 			threadId,
+			cloneTimestamp,
 		});
 
 		expect(result.isDefaultLocation).toBe(true);
 
 		// Path should contain sessions/YYYY/MM/DD/ and the threadId
-		const now = new Date();
-		const year = now.getFullYear().toString();
-		const month = (now.getMonth() + 1).toString().padStart(2, "0");
-		const day = now.getDate().toString().padStart(2, "0");
+		const year = cloneTimestamp.getFullYear().toString();
+		const month = (cloneTimestamp.getMonth() + 1).toString().padStart(2, "0");
+		const day = cloneTimestamp.getDate().toString().padStart(2, "0");
 
 		expect(result.filePath).toContain(join("sessions", year, month, day));
 		expect(result.filePath).toContain(`rollout-`);
@@ -75,6 +76,7 @@ describe("writeClonedSession", () => {
 			outputPath: customPath,
 			codexDir: tempDir,
 			threadId: "unused-for-custom",
+			cloneTimestamp: new Date("2026-03-06T23:12:17.810Z"),
 		});
 
 		expect(result.isDefaultLocation).toBe(false);
@@ -96,6 +98,7 @@ describe("writeClonedSession", () => {
 			outputPath: customPath,
 			codexDir: tempDir,
 			threadId: "test-thread",
+			cloneTimestamp: new Date("2026-03-06T23:12:17.810Z"),
 		});
 
 		const content = await readFile(customPath, "utf-8");
@@ -125,6 +128,7 @@ describe("writeClonedSession", () => {
 				outputPath: targetPath,
 				codexDir: tempDir,
 				threadId: "test",
+				cloneTimestamp: new Date("2026-03-06T23:12:17.810Z"),
 			});
 			expect.unreachable("Should have thrown");
 		} catch (error) {

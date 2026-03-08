@@ -264,18 +264,18 @@ When `--strip-reasoning` is explicitly provided, its value governs reasoning beh
 
 ### AC-7: Telemetry and Context Stripping
 
-**AC-7.1**: When tool stripping is active, the system SHALL remove telemetry `event_msg` records.
+**AC-7.1**: When tool stripping is active, the system SHALL preserve Codex replay-relevant `event_msg` records and remove non-native events by default.
 
-The system uses a preserve-list approach. The following `event_msg` subtypes are preserved; all others are stripped:
+The system uses Codex's native limited persisted-event set as a non-optional compatibility floor. The following `event_msg` subtypes are preserved by default:
 
-**Preserve list**: `user_message`, `error`
+**Native replay floor**: `user_message`, `agent_message`, `agent_reasoning`, `agent_reasoning_raw_content`, `token_count`, `context_compacted`, `entered_review_mode`, `exited_review_mode`, `thread_rolled_back`, `undo_completed`, `turn_aborted`, `turn_started`, `turn_complete`
 
-All other `event_msg` subtypes (including but not limited to `exec_command_begin`, `exec_command_end`, `exec_command_output_delta`, `token_count`, `turn_started`, `turn_complete`, `agent_reasoning`, `agent_message`, `agent_message_delta`, `context_compacted`) are stripped when stripping is active.
+Additionally, `item_completed` is preserved when the completed item is a Plan. Other `event_msg` subtypes remain stripped unless explicitly added through configuration.
 
 - **TC-7.1.1**: Given `event_msg` records with subtypes `exec_command_begin`, `exec_command_end`, `exec_command_output_delta`, when stripping is active, then these records are removed.
-- **TC-7.1.2**: Given `event_msg` records with subtype `user_message`, when stripping is active, then these records are preserved.
-- **TC-7.1.3**: Given `event_msg` records with subtype `error`, when stripping is active, then these records are preserved.
-- **TC-7.1.4**: Given `event_msg` records with subtypes not in the preserve list (`token_count`, `agent_reasoning`, etc.), when stripping is active, then these records are removed.
+- **TC-7.1.2**: Given `event_msg` records with native replay subtypes such as `user_message`, `agent_message`, `turn_started`, and `turn_complete`, when stripping is active, then these records are preserved.
+- **TC-7.1.3**: Given `event_msg` records with subtype `item_completed`, when stripping is active, then Plan completions are preserved and non-Plan completions are removed unless explicitly configured.
+- **TC-7.1.4**: Given `event_msg` records with subtypes not in the native replay floor and not configured (`agent_message_delta`, `exec_command_begin`, etc.), when stripping is active, then these records are removed.
 
 **AC-7.2**: When tool stripping is active, the system SHALL strip `turn_context` records aggressively.
 
@@ -338,9 +338,9 @@ Stripping strategy by zone:
 - **TC-9.2.1**: Given a `cxs-cloner.config.ts` with `customPresets: { "light": { keepTurnsWithTools: 30, truncatePercent: 30 } }`, when `--strip-tools=light` is used, then the custom preset values are applied.
 - **TC-9.2.2**: Given a config file with `defaultPreset: "aggressive"`, when `--strip-tools` is used without a preset name, then the `aggressive` preset is applied instead of `default`.
 
-**AC-9.3**: The system SHALL support an `event_msg` preserve-list override in configuration.
+**AC-9.3**: The system SHALL support an additive `event_msg` preserve-list override in configuration.
 
-- **TC-9.3.1**: Given a config file with `eventPreserveList: ["user_message", "error", "agent_message"]`, when stripping is active, then `agent_message` events are preserved in addition to the built-in defaults.
+- **TC-9.3.1**: Given a config file with `eventPreserveList: ["error"]`, when stripping is active, then `error` events are preserved in addition to the built-in native replay floor.
 
 ### AC-10: Compacted Session Handling
 
@@ -534,7 +534,6 @@ interface CloneStatistics {
 - Archived session handling (`archived_sessions/` directory)
 - Codex plugin/skill integration
 - Thread name lookup via `session_index.jsonl` for `info`/`clone` commands (UUID-only)
-- Writing to `session_index.jsonl` (file-based discovery is sufficient)
 
 ### Assumptions
 

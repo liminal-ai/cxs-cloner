@@ -66,9 +66,13 @@ describe("clone-command", () => {
 		const parsed = JSON.parse(logs.join("\n")) as {
 			success: boolean;
 			clonedThreadId: string;
+			cloneTimestamp: string;
+			sessionIndexUpdated: boolean;
 		};
 		expect(parsed.success).toBe(true);
 		expect(parsed.clonedThreadId).toBeDefined();
+		expect(parsed.cloneTimestamp).toBeDefined();
+		expect(typeof parsed.sessionIndexUpdated).toBe("boolean");
 	});
 
 	it("handles invalid arguments with error output and exit code 1", async () => {

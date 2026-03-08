@@ -1,0 +1,101 @@
+{
+  "generatedAt": "2026-03-07T15:43:13.275Z",
+  "notes": "Fill in session metadata immediately after each native Codex run completes.",
+  "projects": {
+    "st-project-01": {
+      "directory": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/st-project-01",
+      "sessions": [
+        {
+          "role": "build",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-01-build.md",
+          "threadId": "019cc8ef-2631-72b3-9add-f76c4585677b",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T10-34-02-019cc8ef-2631-72b3-9add-f76c4585677b.jsonl",
+          "createdAt": "2026-03-07T15:34:01Z",
+          "note": "Native Codex build session for context-smoother; completed with local build/test passing."
+        },
+        {
+          "role": "assessment",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-01-assessment.md",
+          "threadId": "019cc8f7-a39e-7b01-af1c-86e031c23d42",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T10-43-18-019cc8f7-a39e-7b01-af1c-86e031c23d42.jsonl",
+          "createdAt": "2026-03-07T15:43:18Z",
+          "note": "Fresh-agent assessment session; wrote prioritized findings to session-artifacts/assessment.md."
+        },
+        {
+          "role": "improvements",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-01-improvements.md",
+          "threadId": "019cc8fc-f0dd-71f2-8d56-13be7ac1a120",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T10-49-05-019cc8fc-f0dd-71f2-8d56-13be7ac1a120.jsonl",
+          "createdAt": "2026-03-07T15:49:05Z",
+          "note": "Assessment-driven improvement session; fixed technical-token corruption, added shared boundary logic, and expanded tests/docs."
+        }
+      ]
+    },
+    "st-project-02": {
+      "directory": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/st-project-02",
+      "sessions": [
+        {
+          "role": "build",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-02-build.md",
+          "threadId": "019cc903-daa3-7b11-b6b6-62fd63f52238",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T10-56-38-019cc903-daa3-7b11-b6b6-62fd63f52238.jsonl",
+          "createdAt": "2026-03-07T15:56:38Z",
+          "note": "Native Codex build session for the JSONL summarizer; completed with local build/test passing."
+        },
+        {
+          "role": "assessment",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-02-assessment.md",
+          "threadId": "019cc90b-3855-7b82-85bf-1b27f04c6d5c",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T11-04-41-019cc90b-3855-7b82-85bf-1b27f04c6d5c.jsonl",
+          "createdAt": "2026-03-07T16:04:41Z",
+          "note": "Fresh-agent assessment session; wrote reproducible counting/preview issues to session-artifacts/assessment.md."
+        },
+        {
+          "role": "improvements",
+          "promptFile": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/prompts/st-project-02-improvements.md",
+          "threadId": "019cc91f-ad98-7a53-9f3a-0d45724e765c",
+          "rolloutPath": "/Users/leemoore/.codex/sessions/2026/03/07/rollout-2026-03-07T11-27-02-019cc91f-ad98-7a53-9f3a-0d45724e765c.jsonl",
+          "createdAt": "2026-03-07T16:27:02Z",
+          "note": "Assessment-driven improvement session; fixed mixed prompt-source counting, stabilized llm turn semantics, improved task_complete previews, and hardened input validation/tests."
+        }
+      ]
+    }
+  },
+  "sampleInputs": [
+    {
+      "id": "019caeb5-072a-7c82-ae65-d1648452e0a8",
+      "file": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/samples/codex-jsonl/019caeb5-072a-7c82-ae65-d1648452e0a8.jsonl",
+      "sizeBytes": 4973922,
+      "sourceCwd": "/Users/leemoore/liminal/tools/liminal-spec",
+      "note": "Long copied-context resume thread with dense narrative history."
+    },
+    {
+      "id": "019cac52-12f3-7801-8e23-10a122c41ca1",
+      "file": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/samples/codex-jsonl/019cac52-12f3-7801-8e23-10a122c41ca1.jsonl",
+      "sizeBytes": 4851845,
+      "sourceCwd": "/Users/leemoore/liminal/apps/liminaldb",
+      "note": "In-depth branch review session against liminaldb."
+    },
+    {
+      "id": "019cb671-f028-7133-a095-ca6a3a0a7b18",
+      "file": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/samples/codex-jsonl/019cb671-f028-7133-a095-ca6a3a0a7b18.jsonl",
+      "sizeBytes": 3190124,
+      "sourceCwd": "/Users/leemoore/code/agent-cli-tools/skill-scanner-ts",
+      "note": "Structured Phase 2 parity review for skill-scanner TypeScript port."
+    },
+    {
+      "id": "019cb77c-3edf-7220-836d-34fb9f87e5aa",
+      "file": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/samples/codex-jsonl/019cb77c-3edf-7220-836d-34fb9f87e5aa.jsonl",
+      "sizeBytes": 3795313,
+      "sourceCwd": "/Users/leemoore/code/agent-cli-tools/skill-scanner-ts",
+      "note": "Phase 4 review session with parity and architecture findings."
+    },
+    {
+      "id": "019cc591-4c8c-7703-810e-1933d6b8793d",
+      "file": "/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/samples/codex-jsonl/019cc591-4c8c-7703-810e-1933d6b8793d.jsonl",
+      "sizeBytes": 3957439,
+      "sourceCwd": "/Users/leemoore/code/md-viewer",
+      "note": "Parallel-subagent code design analysis session."
+    }
+  ]
+}

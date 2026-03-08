@@ -1,0 +1,19 @@
+{
+  "name": "context-smoother",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic text smoothing CLI for long-context LLM pipelines.",
+  "bin": {
+    "context-smoother": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "test": "npm run build --silent && node --test dist/tests/*.test.js",
+    "cli": "node dist/src/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

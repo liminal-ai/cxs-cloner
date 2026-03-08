@@ -76,15 +76,15 @@ Only one of `content` or `encrypted_content` is serialized. For stripping:
 - **Full strip**: Remove entire `reasoning` record
 - **Summary-only**: Keep `summary`, drop `content`/`encrypted_content`
 
-### EventMsg Subtypes (stripping strategy)
+### EventMsg Subtypes (replay compatibility strategy)
 
-Most `event_msg` records are UI/telemetry. The stripping strategy uses a **preserve-list** — named subtypes are kept, everything else is stripped. This is forward-compatible: new event types added by future Codex versions are stripped by default rather than accidentally preserved.
+Codex replay/resume rebuilds visible turn history from persisted `event_msg` records, not from `response_item` messages alone. For compatibility-first clones, `cxs-cloner` therefore preserves Codex's native **limited persisted event** floor by default.
 
-**Default preserve-list**: `user_message`, `error`
+**Native replay floor includes**: `user_message`, `agent_message`, `agent_reasoning`, `agent_reasoning_raw_content`, `token_count`, `context_compacted`, `entered_review_mode`, `exited_review_mode`, `thread_rolled_back`, `undo_completed`, `turn_aborted`, `turn_started`, `turn_complete`, and `item_completed` when the item is a Plan.
 
-**Stripped** (includes but not limited to): `exec_command_begin`, `exec_command_end`, `exec_command_output_delta`, `turn_started`, `turn_complete`, `token_count`, `agent_reasoning`, `agent_message`, `agent_message_delta`, `context_compacted`
+**Still stripped by default** (includes but not limited to): `exec_command_begin`, `exec_command_end`, `exec_command_output_delta`, `agent_message_delta`, `agent_reasoning_delta`, `web_search_begin`, and other non-native or extended-only event types.
 
-The preserve-list is configurable via `cxs-cloner.config.ts` to accommodate future Codex versions or user preferences.
+The existing `eventPreserveList` configuration remains additive only: users can preserve extra event types on top of the native floor, but cannot remove the native replay set.
 
 ### TurnContext Records (context savings opportunity)
 
@@ -129,7 +129,7 @@ rollout-YYYY-MM-DDThh-mm-ss-<UUID>.jsonl
 
 **Primary**: Filesystem scan of `~/.codex/sessions/` in reverse chronological order. Filename parsing extracts timestamp (created_at) and UUID (thread_id). File mtime provides updated_at.
 
-**Codex also supports** (not used by cxs-cloner): SQLite `threads` table for indexed queries (feature-gated behind `sqlite` flag), and `session_index.jsonl` for thread name → ID mapping. The cloner uses filesystem-only discovery for simplicity.
+**Codex also supports**: SQLite `threads` table for indexed queries (feature-gated behind `sqlite` flag), and `session_index.jsonl` for thread name → ID mapping. cxs-cloner remains filesystem-first and does not write SQLite, but it now appends `session_index.jsonl` entries for default-location clones when a meaningful clone name can be derived. This keeps named display and name-based resolution closer to native Codex behavior without coupling the cloner to internal DB schema.
 
 ## Resume Capability
 
@@ -149,7 +149,7 @@ codex resume <name>       # By thread name (from session_index.jsonl)
 3. At least one `response_item` with user role content (the resume code reconstructs `initial_messages` from `response_item` records, not `event_msg` records)
 4. Valid JSONL (one JSON object per line)
 
-No SQLite registration required. No additional metadata files required.
+No SQLite registration required. For name-based resolution and native-looking thread titles, cxs-cloner may also append `session_index.jsonl` when cloning into the default active sessions tree.
 
 **Important**: Resume discoverability requires the file to be in `~/.codex/sessions/YYYY/MM/DD/`. Files written to custom paths via `--output` will not be discoverable by `codex resume`.
 

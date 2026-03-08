@@ -30,12 +30,22 @@ export interface ResolvedCloneConfig {
 	verbose: boolean;
 }
 
+export interface CloneIdentity {
+	threadId: string;
+	cloneTimestamp: Date;
+	threadName?: string;
+	sourceThreadId: string;
+}
+
 export interface CloneResult {
 	operationSucceeded: boolean;
 	clonedThreadId: string;
 	clonedSessionFilePath: string;
 	sourceThreadId: string;
 	sourceSessionFilePath: string;
+	cloneTimestamp: string;
+	cloneThreadName?: string;
+	sessionIndexUpdated: boolean;
 	resumable: boolean;
 	statistics: CloneStatistics;
 }
@@ -93,12 +103,19 @@ export interface WriteSessionOptions {
 	outputPath: string | null;
 	codexDir: string;
 	threadId: string;
+	cloneTimestamp: Date;
 }
 
 export interface WriteResult {
 	filePath: string;
 	sizeBytes: number;
 	isDefaultLocation: boolean;
+}
+
+export interface SessionIndexEntry {
+	id: string;
+	thread_name: string;
+	updated_at: string;
 }
 
 export interface ScanOptions {

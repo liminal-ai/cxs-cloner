@@ -1,0 +1,5 @@
+This paragraph came from a scan. It has odd spacing,
+line endings, and punctuation placement!
+
+I want this to be more readable, but I do not want a model
+to rewrite it semantically.

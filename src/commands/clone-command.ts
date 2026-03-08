@@ -9,7 +9,7 @@ import {
 } from "../errors/clone-operation-errors.js";
 import { formatCloneResult } from "../output/clone-result-formatter.js";
 import type { ResolvedCloneConfig } from "../types/clone-operation-types.js";
-import { DEFAULT_EVENT_PRESERVE_LIST } from "../types/codex-session-types.js";
+import { NATIVE_LIMITED_EVENT_PRESERVE_LIST } from "../types/codex-session-types.js";
 import type { CxsConfiguration } from "../types/configuration-types.js";
 import type {
 	ReasoningMode,
@@ -158,10 +158,10 @@ export function buildStripConfig(
 		reasoningMode = "none";
 	}
 
-	// Merge config's eventPreserveList with built-in defaults (union, deduplicated)
+	// Native replay events are always preserved; config entries add extras on top.
 	const mergedPreserveList = [
 		...new Set([
-			...DEFAULT_EVENT_PRESERVE_LIST,
+			...NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 			...cxsConfig.eventPreserveList,
 		]),
 	];
