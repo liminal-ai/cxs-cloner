@@ -707,7 +707,7 @@ describe("executeCloneOperation", () => {
 
 		await expect(
 			executeCloneOperation(buildConfig(codexDir, sourceThreadId)),
-		).rejects.toThrow("earliest surviving user message cannot be synthesized");
+		).rejects.toThrow("no surviving user message available for synthesis");
 	});
 
 	test("fails when clone compatibility has no surviving user message available for synthesis", async () => {

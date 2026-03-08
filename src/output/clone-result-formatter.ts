@@ -22,6 +22,10 @@ function formatJson(result: CloneResult): string {
 }
 
 function formatHuman(result: CloneResult, verbose: boolean): string {
+	if (!result.operationSucceeded) {
+		return "Clone failed.";
+	}
+
 	const stats = result.statistics;
 	const lines: string[] = [];
 

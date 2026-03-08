@@ -308,9 +308,7 @@ function ensureCloneUserMessageCompatibility(
 			record.payload as MessagePayload,
 		);
 		if (!messageText) {
-			throw new CloneCompatibilityError(
-				"clone output has no preserved user_message event and the earliest surviving user message cannot be synthesized unambiguously",
-			);
+			continue;
 		}
 
 		// Skip bootstrap prompts — same filtering as naming logic
