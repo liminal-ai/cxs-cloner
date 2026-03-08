@@ -1,8 +1,0 @@
-{"timestamp":"2026-03-01T11:00:00.000Z","type":"session_meta","payload":{"id":"interrupted-thread","timestamp":"2026-03-01T11:00:00.000Z","cwd":"/tmp/project","originator":"Codex","cli_version":"0.108.0","source":"vscode"}}
-{"timestamp":"2026-03-01T11:00:01.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Start a long task, please."}]}}
-{"timestamp":"2026-03-01T11:00:01.100Z","type":"event_msg","payload":{"type":"user_message","message":"Start a long task, please."}}
-{"timestamp":"2026-03-01T11:00:02.000Z","type":"event_msg","payload":{"type":"turn_aborted","reason":"user_interrupt"}}
-{"timestamp":"2026-03-01T11:00:03.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Actually stop and do the short version."}]}}
-{"timestamp":"2026-03-01T11:00:03.100Z","type":"event_msg","payload":{"type":"user_message","message":"Actually stop and do the short version."}}
-{"timestamp":"2026-03-01T11:00:04.000Z","type":"turn_context","payload":{"turn_id":"turn_0","cwd":"/tmp/project","model":"gpt-5.4"}}
-{"timestamp":"2026-03-01T11:00:05.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Short version complete."}]}}

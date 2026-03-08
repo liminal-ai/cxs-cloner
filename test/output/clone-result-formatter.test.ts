@@ -103,6 +103,38 @@ describe("formatCloneResult", () => {
 		expect(output).toContain("Ghost snapshots:");
 	});
 
+	test("human-readable output includes target cwd when applied", () => {
+		const result = makeCloneResult({
+			targetCwdApplied: "/Users/test/new-project",
+		});
+		const output = formatCloneResult(result, {
+			json: false,
+			verbose: false,
+		});
+
+		expect(output).toContain("Target:  /Users/test/new-project");
+	});
+
+	test("human-readable output omits target line when not applied", () => {
+		const result = makeCloneResult();
+		const output = formatCloneResult(result, {
+			json: false,
+			verbose: false,
+		});
+
+		expect(output).not.toContain("Target:");
+	});
+
+	test("JSON output includes targetCwdApplied when set", () => {
+		const result = makeCloneResult({
+			targetCwdApplied: "/Users/test/new-project",
+		});
+		const output = formatCloneResult(result, { json: true, verbose: false });
+		const parsed = JSON.parse(output);
+
+		expect(parsed.targetCwdApplied).toBe("/Users/test/new-project");
+	});
+
 	test("compaction info shown when detected", () => {
 		const result = makeCloneResult({
 			statistics: {

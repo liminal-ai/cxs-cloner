@@ -1,4 +1,0 @@
-Hey team, I pushed a rough draft of the parser.
-Can you review it? I think there are some edge cases...
-
-Also, if you see weird spacing in this message, sorry!

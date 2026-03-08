@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
+import { execSync } from "node:child_process";
 import {
 	chmod,
 	mkdir,
@@ -19,6 +20,7 @@ import type { ResolvedCloneConfig } from "../../src/types/clone-operation-types.
 import type {
 	RolloutLine,
 	SessionMetaPayload,
+	TurnContextPayload,
 } from "../../src/types/codex-session-types.js";
 import { NATIVE_LIMITED_EVENT_PRESERVE_LIST } from "../../src/types/codex-session-types.js";
 import { SessionBuilder } from "../fixtures/builders/session-builder.js";
@@ -79,6 +81,7 @@ function buildConfig(
 		sessionId: threadId,
 		codexDir,
 		outputPath: null,
+		targetCwd: null,
 		stripConfig: {
 			toolPreset: { keepTurnsWithTools: 20, truncatePercent: 50 },
 			reasoningMode: "full",
@@ -948,6 +951,221 @@ describe("executeCloneOperation", () => {
 
 		expect(result.operationSucceeded).toBe(true);
 		expect(result.clonedThreadId).toBeDefined();
+	});
+
+	// target-cwd: cross-directory clone rewrites session_meta.cwd and turn_context.cwd
+	test("target-cwd rewrites session_meta.cwd and all turn_context.cwd", async () => {
+		const codexDir = await createTempDir();
+		const targetDir = await createTempDir();
+		const sourceThreadId = "source-target-cwd-rewrite-0000000";
+		const records: RolloutLine[] = [
+			{
+				timestamp: "2026-02-28T14:30:00.000Z",
+				type: "session_meta",
+				payload: {
+					id: sourceThreadId,
+					timestamp: "2026-02-28T14:30:00.000Z",
+					cwd: "/original/project",
+					originator: "test",
+					cli_version: "1.0.0",
+					source: "exec",
+					git: {
+						commit_hash: "old_hash",
+						branch: "old_branch",
+						origin_url: "https://github.com/old/repo.git",
+					},
+				},
+			},
+			{
+				timestamp: "2026-02-28T14:30:01.000Z",
+				type: "turn_context",
+				payload: {
+					cwd: "/original/project",
+					model: "o4-mini",
+					approval_policy: { mode: "auto" },
+					sandbox_policy: { mode: "off" },
+					summary: null,
+				},
+			},
+			{
+				timestamp: "2026-02-28T14:30:02.000Z",
+				type: "event_msg",
+				payload: {
+					type: "user_message",
+					message: "Hello from original project",
+				},
+			},
+			{
+				timestamp: "2026-02-28T14:30:03.000Z",
+				type: "response_item",
+				payload: {
+					type: "message",
+					role: "user",
+					content: [
+						{ type: "input_text", text: "Hello from original project" },
+					],
+				},
+			},
+			{
+				timestamp: "2026-02-28T14:30:04.000Z",
+				type: "response_item",
+				payload: {
+					type: "message",
+					role: "assistant",
+					content: [{ type: "output_text", text: "Got it." }],
+					end_turn: true,
+				},
+			},
+		];
+
+		await writeTestSession(codexDir, sourceThreadId, records);
+
+		const result = await executeCloneOperation(
+			buildConfig(codexDir, sourceThreadId, { targetCwd: targetDir }),
+		);
+
+		expect(result.targetCwdApplied).toBe(targetDir);
+
+		const outputRecords = await readOutputRecords(result.clonedSessionFilePath);
+		const meta = findSessionMeta(outputRecords);
+		expect(meta!.cwd).toBe(targetDir);
+
+		// All turn_context records should have updated cwd
+		const turnContexts = outputRecords.filter(
+			(r) => r.type === "turn_context",
+		);
+		for (const tc of turnContexts) {
+			expect((tc.payload as TurnContextPayload).cwd).toBe(targetDir);
+		}
+
+		// Identity fields should still be correct
+		expect(meta!.id).toBe(result.clonedThreadId);
+		expect(meta!.forked_from_id).toBe(sourceThreadId);
+	});
+
+	// target-cwd: git metadata recomputed from target directory (git-backed)
+	test("target-cwd recomputes git metadata from target repo", async () => {
+		const codexDir = await createTempDir();
+		const targetDir = await createTempDir();
+		const sourceThreadId = "source-target-cwd-git-00000000000";
+
+		// Initialize a git repo in the target directory
+		execSync("git init && git commit --allow-empty -m 'init'", {
+			cwd: targetDir,
+			stdio: "ignore",
+		});
+
+		const records = new SessionBuilder()
+			.addSessionMeta({
+				id: sourceThreadId,
+				cwd: "/original/project",
+				git: {
+					commit_hash: "stale_hash",
+					branch: "stale_branch",
+					origin_url: "https://github.com/stale/repo.git",
+				},
+			})
+			.addTurn({ functionCalls: 1, events: ["user_message"] })
+			.build();
+
+		await writeTestSession(codexDir, sourceThreadId, records);
+
+		const result = await executeCloneOperation(
+			buildConfig(codexDir, sourceThreadId, { targetCwd: targetDir }),
+		);
+
+		const outputRecords = await readOutputRecords(result.clonedSessionFilePath);
+		const meta = findSessionMeta(outputRecords);
+
+		expect(meta!.cwd).toBe(targetDir);
+		expect(meta!.git).toBeDefined();
+		expect(meta!.git!.commit_hash).toBeDefined();
+		expect(meta!.git!.commit_hash).not.toBe("stale_hash");
+		// No remote configured, so origin_url should be absent
+		expect(meta!.git!.origin_url).toBeUndefined();
+	});
+
+	// target-cwd: non-git target directory clears git metadata
+	test("target-cwd clears git metadata for non-git directory", async () => {
+		const codexDir = await createTempDir();
+		const targetDir = await createTempDir(); // plain dir, no git
+		const sourceThreadId = "source-target-cwd-nogit-0000000";
+
+		const records = new SessionBuilder()
+			.addSessionMeta({
+				id: sourceThreadId,
+				cwd: "/original/project",
+				git: {
+					commit_hash: "abc123",
+					branch: "main",
+					origin_url: "https://github.com/user/repo.git",
+				},
+			})
+			.addTurn({ functionCalls: 1, events: ["user_message"] })
+			.build();
+
+		await writeTestSession(codexDir, sourceThreadId, records);
+
+		const result = await executeCloneOperation(
+			buildConfig(codexDir, sourceThreadId, { targetCwd: targetDir }),
+		);
+
+		const outputRecords = await readOutputRecords(result.clonedSessionFilePath);
+		const meta = findSessionMeta(outputRecords);
+
+		expect(meta!.cwd).toBe(targetDir);
+		expect(meta!.git).toBeUndefined();
+	});
+
+	// target-cwd: omitting flag preserves original cwd (regression guard)
+	test("no target-cwd preserves original session cwd unchanged", async () => {
+		const codexDir = await createTempDir();
+		const sourceThreadId = "source-no-target-cwd-000000000";
+		const records = new SessionBuilder()
+			.addSessionMeta({
+				id: sourceThreadId,
+				cwd: "/original/project",
+				git: {
+					commit_hash: "abc123",
+					branch: "main",
+				},
+			})
+			.addTurn({ functionCalls: 1, events: ["user_message"] })
+			.build();
+
+		await writeTestSession(codexDir, sourceThreadId, records);
+
+		const result = await executeCloneOperation(
+			buildConfig(codexDir, sourceThreadId),
+		);
+
+		const outputRecords = await readOutputRecords(result.clonedSessionFilePath);
+		const meta = findSessionMeta(outputRecords);
+
+		expect(meta!.cwd).toBe("/original/project");
+		expect(meta!.git?.commit_hash).toBe("abc123");
+		expect(meta!.git?.branch).toBe("main");
+		expect(result.targetCwdApplied).toBeUndefined();
+	});
+
+	// target-cwd: result includes targetCwdApplied in output
+	test("target-cwd sets targetCwdApplied in result", async () => {
+		const codexDir = await createTempDir();
+		const targetDir = await createTempDir();
+		const sourceThreadId = "source-target-cwd-result-0000000";
+		const records = new SessionBuilder()
+			.addSessionMeta({ id: sourceThreadId })
+			.addTurn({ functionCalls: 1, events: ["user_message"] })
+			.build();
+
+		await writeTestSession(codexDir, sourceThreadId, records);
+
+		const result = await executeCloneOperation(
+			buildConfig(codexDir, sourceThreadId, { targetCwd: targetDir }),
+		);
+
+		expect(result.targetCwdApplied).toBe(targetDir);
+		expect(result.operationSucceeded).toBe(true);
 	});
 
 	// Non-TC: Concurrent clone operations (UUID uniqueness)

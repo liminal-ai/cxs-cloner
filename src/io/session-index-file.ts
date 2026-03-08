@@ -1,4 +1,6 @@
-import { appendFile, readFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { appendFile } from "node:fs/promises";
+import { createInterface } from "node:readline";
 import { join } from "pathe";
 import { FileOperationError } from "../errors/clone-operation-errors.js";
 import type { SessionIndexEntry } from "../types/clone-operation-types.js";
@@ -15,24 +17,37 @@ export async function readSessionIndexName(
 ): Promise<string | null> {
 	const filePath = getSessionIndexPath(codexDir);
 
-	let content: string;
-	try {
-		content = await readFile(filePath, "utf-8");
-	} catch (error) {
-		const nodeError = error as NodeJS.ErrnoException;
-		if (nodeError?.code === "ENOENT") {
+	let lastName: string | null = null;
+
+	const stream = createReadStream(filePath, { encoding: "utf-8" });
+
+	// createReadStream emits errors asynchronously (including ENOENT)
+	const streamError = await new Promise<NodeJS.ErrnoException | null>(
+		(resolve) => {
+			stream.once("error", resolve);
+			stream.once("readable", () => resolve(null));
+			stream.once("end", () => resolve(null));
+		},
+	);
+
+	if (streamError) {
+		stream.destroy();
+		if (streamError.code === "ENOENT") {
 			return null;
 		}
 		throw new FileOperationError(
 			filePath,
 			"read",
-			error instanceof Error ? error.message : String(error),
+			streamError.message,
 		);
 	}
 
-	let lastName: string | null = null;
+	const rl = createInterface({
+		input: stream,
+		crlfDelay: Number.POSITIVE_INFINITY,
+	});
 
-	for (const line of content.split("\n")) {
+	for await (const line of rl) {
 		if (line.trim() === "") {
 			continue;
 		}
@@ -53,6 +68,9 @@ export async function readSessionIndexName(
 			lastName = entry.thread_name;
 		}
 	}
+
+	rl.close();
+	stream.destroy();
 
 	return lastName;
 }

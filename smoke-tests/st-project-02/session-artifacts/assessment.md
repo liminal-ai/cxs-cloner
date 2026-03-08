@@ -1,5 +1,0 @@
-The assessment is written to [session-artifacts/assessment.md](/Users/leemoore/code/agent-cli-tools/cxs-cloner/smoke-tests/st-project-02/session-artifacts/assessment.md).
-
-The highest-priority issues are that `agenticTurnCount` can undercount and merge turns when a rollout mixes `event_msg.user_message` with `response_item` user prompts, `llmTurnCount` changes meaning across fallback modes, and `finalModelMessagePreview` misses `task_complete.last_agent_message`. I also called out that the token metric is really a raw-log-size heuristic, the summary schema is too lossy for diagnostics, large/malformed file handling is brittle, and the test suite doesn’t pin the important edge cases.
-
-I verified the review by running `npm test`, exercising the CLI against a real bundled sample rollout, and creating small temporary JSONL repros for the counting and preview failures.

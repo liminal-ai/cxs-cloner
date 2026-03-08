@@ -17,22 +17,8 @@ export function formatCloneResult(
 }
 
 function formatJson(result: CloneResult): string {
-	return JSON.stringify(
-		{
-			success: result.operationSucceeded,
-			clonedThreadId: result.clonedThreadId,
-			clonedSessionFilePath: result.clonedSessionFilePath,
-			sourceThreadId: result.sourceThreadId,
-			sourceSessionFilePath: result.sourceSessionFilePath,
-			cloneTimestamp: result.cloneTimestamp,
-			cloneThreadName: result.cloneThreadName,
-			sessionIndexUpdated: result.sessionIndexUpdated,
-			resumable: result.resumable,
-			statistics: result.statistics,
-		},
-		null,
-		2,
-	);
+	const { operationSucceeded, ...rest } = result;
+	return JSON.stringify({ success: operationSucceeded, ...rest }, null, 2);
 }
 
 function formatHuman(result: CloneResult, verbose: boolean): string {
@@ -46,6 +32,9 @@ function formatHuman(result: CloneResult, verbose: boolean): string {
 	lines.push(`  Thread:  ${result.clonedThreadId}`);
 	if (result.cloneThreadName) {
 		lines.push(`  Name:    ${result.cloneThreadName}`);
+	}
+	if (result.targetCwdApplied) {
+		lines.push(`  Target:  ${result.targetCwdApplied}`);
 	}
 	lines.push("");
 	lines.push(

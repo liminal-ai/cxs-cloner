@@ -1,3 +1,5 @@
+import { stat } from "node:fs/promises";
+import { resolve } from "pathe";
 import { defineCommand } from "citty";
 import { validateStrippingFlags } from "../cli/normalize-args.js";
 import { loadConfiguration } from "../config/configuration-loader.js";
@@ -46,6 +48,12 @@ export const cloneCommand = defineCommand({
 			description: "Custom output path (default: Codex sessions directory)",
 			required: false,
 		},
+		"target-cwd": {
+			type: "string",
+			description:
+				"Override cloned session working directory (rewrites cwd and git metadata)",
+			required: false,
+		},
 		force: {
 			type: "boolean",
 			description: "Skip malformed JSON lines instead of aborting",
@@ -90,10 +98,34 @@ export const cloneCommand = defineCommand({
 				args["strip-reasoning"],
 			);
 
+			// Resolve and validate target-cwd if provided
+			let targetCwd: string | null = null;
+			if (args["target-cwd"]) {
+				targetCwd = resolve(args["target-cwd"]);
+				try {
+					const dirStat = await stat(targetCwd);
+					if (!dirStat.isDirectory()) {
+						throw new ArgumentValidationError(
+							"--target-cwd",
+							`Path exists but is not a directory: ${targetCwd}`,
+						);
+					}
+				} catch (error) {
+					if (error instanceof ArgumentValidationError) {
+						throw error;
+					}
+					throw new ArgumentValidationError(
+						"--target-cwd",
+						`Path does not exist or is not readable: ${targetCwd}`,
+					);
+				}
+			}
+
 			const config: ResolvedCloneConfig = {
 				sessionId: args.sessionId,
 				codexDir: cxsConfig.codexDir,
 				outputPath: args.output ?? null,
+				targetCwd,
 				stripConfig,
 				force: args.force ?? false,
 				jsonOutput: args.json ?? false,

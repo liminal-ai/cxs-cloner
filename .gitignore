@@ -1,3 +1,7 @@
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Internal process artifacts — specs, epics, verification logs
+docs/project/
+docs/skill-development/

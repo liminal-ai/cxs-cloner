@@ -24,6 +24,7 @@ export interface ResolvedCloneConfig {
 	sessionId: string;
 	codexDir: string;
 	outputPath: string | null;
+	targetCwd: string | null;
 	stripConfig: StripConfig;
 	force: boolean;
 	jsonOutput: boolean;
@@ -45,6 +46,7 @@ export interface CloneResult {
 	sourceSessionFilePath: string;
 	cloneTimestamp: string;
 	cloneThreadName?: string;
+	targetCwdApplied?: string;
 	sessionIndexUpdated: boolean;
 	resumable: boolean;
 	statistics: CloneStatistics;

@@ -451,7 +451,10 @@ function findEmptyTurnIndices(
 				}
 			} else if (record.type === "event_msg") {
 				const eventPayload = record.payload as EventMsgPayload;
-				if (preserveSet.has(eventPayload.type)) {
+				if (
+					preserveSet.has(eventPayload.type) ||
+					isNativeLimitedEventPayload(eventPayload)
+				) {
 					hasMessage = true;
 				}
 			}

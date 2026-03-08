@@ -70,6 +70,7 @@ function buildConfig(
 		sessionId: threadId,
 		codexDir,
 		outputPath: null,
+		targetCwd: null,
 		stripConfig: {
 			toolPreset: BUILT_IN_PRESETS.default,
 			reasoningMode: "full",

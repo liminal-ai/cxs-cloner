@@ -35,12 +35,15 @@ CUSTOM PRESETS
 OUTPUT OPTIONS
   --json       JSON output (for agents)
 
+CLONE OPTIONS
+  --target-cwd <path>  Override cloned session working directory
+
 GLOBAL OPTIONS
   --help, -h       Show help
   --version        Show version
 
 ENVIRONMENT
-  CXS_CODEX_DIR              Codex data directory (default: ~/.codex)
+  CXS_CLONER_CODEX_DIR       Codex data directory (default: ~/.codex)
 
 Run "cxs-cloner <command> --help" for command-specific options.`;
 

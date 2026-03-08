@@ -1,2 +1,10 @@
 */dist/
 */node_modules/
+
+# Generated projects — kept locally, not in version control
+st-project-01/
+st-project-02/
+
+# Real session data — kept locally for manual smoke tests
+samples/codex-jsonl/
+manifest/session-manifest.json
