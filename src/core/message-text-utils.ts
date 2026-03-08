@@ -9,7 +9,12 @@ export function extractMessageText(payload: MessagePayload): string {
 		return "";
 	}
 	return payload.content
-		.map((item) => ("text" in item ? item.text : ""))
+		.map((item) => {
+			if (!item || typeof item !== "object") {
+				return "";
+			}
+			return "text" in item ? (item as { text: string }).text : "";
+		})
 		.join("");
 }
 

@@ -10,7 +10,7 @@ import type {
 } from "../types/codex-session-types.js";
 import {
 	TURN_CONTEXT_STRUCTURAL_FIELDS,
-	isNativeLimitedEventPayload,
+	isReplayPreservedEvent,
 } from "../types/codex-session-types.js";
 import type { StripConfig, StripZone } from "../types/tool-removal-types.js";
 
@@ -194,7 +194,7 @@ export function stripRecords(
 				const eventPayload = record.payload as EventMsgPayload;
 				if (
 					!preserveSet.has(eventPayload.type) &&
-					!isNativeLimitedEventPayload(eventPayload)
+					!isReplayPreservedEvent(eventPayload)
 				) {
 					indicesToRemove.add(i);
 					eventMessagesRemoved++;
@@ -453,7 +453,7 @@ function findEmptyTurnIndices(
 				const eventPayload = record.payload as EventMsgPayload;
 				if (
 					preserveSet.has(eventPayload.type) ||
-					isNativeLimitedEventPayload(eventPayload)
+					isReplayPreservedEvent(eventPayload)
 				) {
 					hasMessage = true;
 				}

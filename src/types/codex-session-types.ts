@@ -207,7 +207,7 @@ export const NATIVE_LIMITED_EVENT_PRESERVE_LIST: readonly string[] = [
 	"turn_complete",
 ] as const;
 
-export function isNativeLimitedEventPayload(payload: EventMsgPayload): boolean {
+export function isReplayPreservedEvent(payload: EventMsgPayload): boolean {
 	if (NATIVE_LIMITED_EVENT_PRESERVE_LIST.includes(payload.type)) {
 		return true;
 	}

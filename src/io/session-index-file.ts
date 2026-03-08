@@ -1,6 +1,7 @@
 import { createReadStream } from "node:fs";
 import { appendFile } from "node:fs/promises";
 import { createInterface } from "node:readline";
+import consola from "consola";
 import { join } from "pathe";
 import { FileOperationError } from "../errors/clone-operation-errors.js";
 import type { SessionIndexEntry } from "../types/clone-operation-types.js";
@@ -56,6 +57,7 @@ export async function readSessionIndexName(
 		try {
 			parsed = JSON.parse(line) as unknown;
 		} catch {
+			consola.debug(`Skipping malformed line in session index: ${line.slice(0, 80)}`);
 			continue;
 		}
 

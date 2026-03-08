@@ -240,7 +240,11 @@ function derivePromptTitle(text: string): string {
 	if (candidate.length <= 120) {
 		return candidate;
 	}
-	return `${candidate.slice(0, 117)}...`;
+	// Truncate at last word boundary before limit
+	const truncated = candidate.slice(0, 117);
+	const lastSpace = truncated.lastIndexOf(" ");
+	const breakPoint = lastSpace > 60 ? lastSpace : 117;
+	return `${candidate.slice(0, breakPoint)}...`;
 }
 
 function findFirstUserMessageText(records: RolloutLine[]): string | null {
@@ -334,6 +338,6 @@ async function rollbackClonedSession(filePath: string): Promise<void> {
 	try {
 		await unlink(filePath);
 	} catch {
-		// Best effort: preserve the original write error if cleanup also fails.
+		consola.warn(`Rollback failed: could not delete orphaned clone at ${filePath}`);
 	}
 }

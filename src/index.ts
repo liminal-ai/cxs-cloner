@@ -48,7 +48,7 @@ export {
 export {
 	NATIVE_LIMITED_EVENT_PRESERVE_LIST,
 	TURN_CONTEXT_STRUCTURAL_FIELDS,
-	isNativeLimitedEventPayload,
+	isReplayPreservedEvent,
 } from "./types/codex-session-types.js";
 export type {
 	CloneIdentity,

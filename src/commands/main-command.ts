@@ -61,7 +61,10 @@ export const mainCommand = defineCommand({
 	run({ rawArgs }) {
 		// Only show help when no subcommand was given
 		const subCommandNames = ["list", "info", "clone"];
-		const hasSubCommand = rawArgs?.some((arg) => subCommandNames.includes(arg));
+		const firstPositional = rawArgs?.find((arg) => !arg.startsWith("-"));
+		const hasSubCommand = firstPositional
+			? subCommandNames.includes(firstPositional)
+			: false;
 		if (!hasSubCommand) {
 			console.log(HELP_TEXT);
 		}

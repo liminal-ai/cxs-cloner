@@ -1049,11 +1049,11 @@ describe("executeCloneOperation", () => {
 		const targetDir = await createTempDir();
 		const sourceThreadId = "source-target-cwd-git-00000000000";
 
-		// Initialize a git repo in the target directory
-		execSync("git init && git commit --allow-empty -m 'init'", {
-			cwd: targetDir,
-			stdio: "ignore",
-		});
+		// Initialize a git repo in the target directory with local identity
+		execSync(
+			"git init -b main && git -c user.name='Test' -c user.email='test@test.invalid' commit --allow-empty -m init",
+			{ cwd: targetDir, stdio: "ignore" },
+		);
 
 		const records = new SessionBuilder()
 			.addSessionMeta({
@@ -1081,6 +1081,7 @@ describe("executeCloneOperation", () => {
 		expect(meta!.git).toBeDefined();
 		expect(meta!.git!.commit_hash).toBeDefined();
 		expect(meta!.git!.commit_hash).not.toBe("stale_hash");
+		expect(meta!.git!.branch).toBe("main");
 		// No remote configured, so origin_url should be absent
 		expect(meta!.git!.origin_url).toBeUndefined();
 	});
